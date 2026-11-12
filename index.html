@@ -1,0 +1,2836 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Edexcel International GCSE 物理 U6–U8 交互仿真实验，观察、测量、记录和作图。">
+  <meta name="theme-color" content="#f5f6ef">
+  <title>物理仿真实验室 · IGCSE</title>
+  <style>:root {
+  color-scheme: light;
+  --ink: #192a24;
+  --muted: #51655c;
+  --paper: #f5f6ef;
+  --surface: #fcfdf8;
+  --rule: #d9e1d5;
+  --jade: #16483b;
+  --deep: #11392f;
+  --accent: #c8e7a1;
+  --pale: #e8f2e3;
+  --copper: #a54d2a;
+  --font: "Instrument Sans", "Avenir Next", "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", system-ui, sans-serif;
+  --shadow: 0 1px 3px rgb(36 57 42 / 6%);
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font); line-height: 1.5; }
+button, input, textarea { font: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: default; }
+a { color: inherit; }
+a:focus-visible, button:focus-visible, input:focus-visible + .toggle, textarea:focus-visible {
+  outline: 3px solid #397a62;
+  outline-offset: 4px;
+}
+[hidden] { display: none !important; }
+.wrap { width: min(1220px, calc(100% - 80px)); margin-inline: auto; }
+.sr-only, .field-control input {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+.skip-link { position: absolute; z-index: 5; top: 8px; left: 8px; transform: translateY(-180%); padding: 10px; background: white; }
+.skip-link:focus { transform: none; }
+.site-header { border-bottom: 1px solid var(--rule); }
+.header-inner { display: flex; align-items: center; justify-content: space-between; min-height: 69px; gap: 12px; }
+.brand { display: flex; align-items: center; gap: 12px; color: var(--deep); font-weight: 720; font-size: 15px; }
+.brand-divider { color: #7b8a80; padding-inline: 3px; }
+.brand-icon {
+  background: var(--jade); width: 35px; height: 35px; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center; gap: 3px;
+}
+.brand-icon i { display: block; width: 5px; height: 15px; border: 1.6px solid var(--accent); border-radius: 6px; transform: skew(-13deg); }
+.quiet {
+  background: transparent; color: var(--jade); border: 1px solid #cbd8cb; border-radius: 9px;
+  min-height: 42px; padding: 0 13px; display: inline-flex; align-items: center; justify-content: center;
+  gap: 7px; font-size: 14px; font-weight: 650; white-space: nowrap;
+}
+.quiet:hover:not(:disabled) { background: var(--pale); border-color: #a9c2b0; }
+.quiet:disabled { color: #65776b; background: #ebefe8; }
+.help-icon { display: inline-grid; width: 17px; height: 17px; border-radius: 50%; border: 1px solid currentColor; place-items: center; font-size: 12px; line-height: 1; }
+.hero { display: flex; align-items: end; justify-content: space-between; gap: 30px; padding: 31px 0 27px; }
+h1, h2, h3, p { margin: 0; }
+.hero h1 { font-size: clamp(34px, 4vw, 56px); line-height: 1.16; letter-spacing: -.045em; font-weight: 800; color: var(--deep); }
+.hero p { color: var(--muted); margin-top: 10px; font-size: 17px; }
+.progress-card { width: clamp(175px, 21vw, 252px); flex: none; padding-bottom: 4px; }
+.progress-text { display: flex; align-items: center; justify-content: space-between; gap: 15px; font-size: 13px; color: var(--muted); margin-bottom: 9px; }
+.progress-text strong { color: var(--jade); font-variant-numeric: tabular-nums; font-size: 15px; }
+.progress-meter { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 4px; }
+.progress-meter span { height: 6px; border-radius: 3px; background: #dfe7dc; }
+.progress-meter .filled { background: #3b805f; }
+
+.panel { background: var(--surface); border: 1px solid var(--rule); border-radius: 18px; box-shadow: var(--shadow); min-width: 0; }
+.bench { display: grid; grid-template-columns: minmax(0, 1fr) minmax(305px, .46fr); align-items: stretch; gap: 18px; }
+.stage { overflow: hidden; display: flex; flex-direction: column; }
+.stage-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 21px; min-height: 61px; }
+.stage-heading h2 { color: var(--deep); font-size: 20px; font-weight: 760; }
+.field-control { display: flex; align-items: center; gap: 8px; color: var(--muted); cursor: pointer; font-size: 13px; min-height: 32px; user-select: none; }
+.toggle { width: 34px; height: 19px; border: 1px solid #aabdb1; background: #e7ede5; border-radius: 12px; padding: 2px; transition: background .18s; }
+.toggle::after { content: ""; display: block; width: 13px; height: 13px; border-radius: 50%; background: white; box-shadow: 0 1px 2px #0003; transition: transform .18s; }
+.field-control input:checked + .toggle { background: #397b62; border-color: #397b62; }
+.field-control input:checked + .toggle::after { transform: translateX(15px); }
+.stage-view { background: #f1f4ec; border-block: 1px solid var(--rule); display: grid; place-items: center; flex: 1; }
+#scene { display: block; width: 100%; height: auto; aspect-ratio: 780 / 420; }
+.readouts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding-block: 12px; }
+.readout { display: flex; flex-direction: column; padding-inline: clamp(11px, 2vw, 23px); gap: 2px; }
+.readout + .readout { border-left: 1px solid var(--rule); }
+.readout > span { color: var(--muted); font-size: 12px; }
+.readout > strong { display: flex; align-items: center; gap: 7px; font-size: 21px; color: var(--deep); line-height: 1.4; font-variant-numeric: tabular-nums; }
+.readout strong small { color: var(--muted); font-size: 12px; font-weight: 600; }
+.status-dot { flex: none; width: 9px; height: 9px; border-radius: 50%; background: #83928a; }
+#powerState.is-on .status-dot { background: #3a9268; box-shadow: 0 0 0 3px #e1f0e4; }
+
+.controls { padding: 24px; display: flex; flex-direction: column; justify-content: center; }
+.round-tag { font-size: 13px; font-weight: 700; color: var(--jade); margin-bottom: 9px; }
+.controls h2 { font-size: 25px; line-height: 1.25; color: var(--deep); }
+.subtle { font-size: 14px; color: var(--muted); margin-top: 8px; }
+#coilPicker { min-inline-size: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 16px 0 20px; padding: 0; gap: 7px; border: 0; }
+.coil-choice {
+  min-height: 62px; border: 1px solid #d3ddcf; border-radius: 10px; background: #f3f6ef; color: var(--ink);
+  padding: 6px 3px; display: flex; align-items: center; justify-content: center; gap: 4px;
+  transition: border-color .18s, background .18s;
+}
+.coil-choice strong { font-size: clamp(20px, 2.2vw, 27px); font-variant-numeric: tabular-nums; line-height: 1.15; letter-spacing: -.04em; }
+.coil-choice span { color: var(--muted); font-size: 12px; }
+.coil-choice:hover:not(:disabled) { border-color: #79a98b; }
+.coil-choice[aria-pressed="true"] { border-color: #458163; background: #e5f1df; color: var(--deep); box-shadow: inset 0 0 0 1px #458163; }
+.coil-choice:disabled:not([aria-pressed="true"]) { opacity: .62; }
+.steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); list-style: none; padding: 15px 0 0; margin: 0; border-top: 1px solid var(--rule); }
+.steps li { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; color: #586b61; white-space: nowrap; }
+.steps li::after { content: ""; height: 1px; width: calc(100% - 31px); background: var(--rule); position: absolute; left: calc(50% + 15px); top: 13px; }
+.steps li:last-child::after { display: none; }
+.steps li span {
+  width: 27px; height: 27px; border-radius: 50%; display: grid; place-items: center; color: var(--muted);
+  background: #f2f5ee; border: 1px solid var(--rule); font-size: 12px; font-weight: 720;
+}
+.steps li[aria-current="step"] { font-weight: 720; color: var(--jade); }
+.steps li[aria-current="step"] span { background: var(--jade); color: white; border-color: var(--jade); }
+.steps .done span { background: #e5efdf; border-color: #c5dac6; color: var(--jade); }
+.action-hint { margin: 14px 0 12px; color: var(--muted); font-size: 13px; min-height: 3em; }
+.primary {
+  width: 100%; min-height: 48px; padding: 10px 14px; background: var(--jade); color: #fff; font-weight: 720;
+  border: 1px solid var(--jade); border-radius: 10px; display: flex; justify-content: space-between;
+  align-items: center; gap: 10px; text-align: left; text-decoration: none; font-size: 15px;
+}
+.primary:hover:not(:disabled) { background: #21634f; }
+.primary:disabled { background: #e2eae0; border-color: #d2dfd2; color: #53695c; }
+.primary > span:last-child:not(:first-child) { color: var(--accent); font-size: 19px; line-height: 1; }
+.primary:disabled > span:last-child { color: #53695c; }
+.complete-link { margin-top: 17px; }
+
+.results { scroll-margin-top: 18px; margin-top: 32px; }
+.section-heading { display: flex; align-items: end; justify-content: space-between; gap: 15px; margin-bottom: 15px; }
+.section-heading h2 { font-size: 26px; font-weight: 760; line-height: 1.2; color: var(--deep); }
+.section-heading p { color: var(--muted); margin-top: 5px; font-size: 14px; }
+.result-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.data-card { overflow: hidden; display: flex; flex-direction: column; }
+table { border-collapse: collapse; width: 100%; table-layout: fixed; text-align: center; font-size: 14px; font-variant-numeric: tabular-nums; }
+th, td { height: 53px; padding: 4px 2px; }
+thead { background: #eef4eb; color: var(--jade); }
+tbody tr { border-bottom: 1px solid var(--rule); }
+tbody th { color: var(--deep); font-weight: 750; }
+tbody th span { font-weight: 500; color: var(--muted); font-size: 11px; }
+tbody td:last-child { color: var(--jade); font-weight: 760; }
+tbody td.next-cell { box-shadow: inset 0 -2px #8cba9b; background: #f0f7ed; }
+.table-note { padding: 13px 14px; font-size: 12px; color: var(--muted); margin-top: auto; }
+.chart-card { padding: 13px 15px 4px; }
+.chart-card h3 { font-weight: 700; color: var(--deep); font-size: 14px; }
+.chart-card h3 span { color: var(--muted); font-weight: 550; font-size: 12px; }
+#plot { display: block; width: 100%; height: 231px; }
+.conclusion-card { padding: 16px 19px; margin-top: 18px; }
+.conclusion-card label { color: var(--deep); font-size: 16px; }
+.conclusion-card p { color: var(--muted); font-size: 14px; margin: 5px 0 10px; }
+textarea {
+  display: block; width: 100%; background: #f6f8f2; border: 1px solid #cddbcc; border-radius: 8px;
+  color: var(--ink); padding: 9px 11px; resize: vertical; font-size: 15px;
+}
+textarea::placeholder { color: #627468; }
+.site-footer { padding: 20px 0 26px; font-size: 12px; color: var(--muted); }
+
+dialog {
+  background: var(--surface); color: var(--ink); border: 1px solid var(--rule); border-radius: 16px;
+  max-width: min(530px, calc(100% - 30px)); padding: 22px; box-shadow: 0 20px 65px #0c211a30;
+}
+dialog::backdrop { background: rgb(16 42 33 / .43); }
+.dialog-heading { display: flex; align-items: start; justify-content: space-between; gap: 16px; margin-bottom: 12px; }
+.dialog-heading h2 { font-size: 21px; color: var(--deep); }
+.help-list { padding-left: 1.4em; margin: 0 0 15px; font-size: 15px; }
+.help-list li { padding-left: 3px; margin: 0 0 7px; }
+.dialog-note { font-size: 14px; color: var(--muted); }
+.dialog-actions { display: flex; justify-content: end; gap: 8px; margin-top: 18px; }
+.dialog-actions .primary { width: auto; justify-content: center; min-height: 42px; }
+@media (max-width: 1050px) {
+  .wrap { width: calc(100% - 48px); }
+  .controls { padding: 19px; }
+}
+@media (max-width: 780px) {
+  .wrap { width: calc(100% - 30px); }
+  .header-inner { min-height: 57px; }
+  .hero { padding-block: 23px 20px; }
+  .hero p { font-size: 14px; }
+  .bench { grid-template-columns: 1fr; gap: 13px; }
+  .controls { padding: 17px; }
+  .results-grid { grid-template-columns: 1fr; gap: 12px; }
+  .round-tag { margin-bottom: 5px; }
+  .controls h2 { font-size: 23px; }
+  #coilPicker { margin: 12px 0 15px; }
+  .coil-choice { min-height: 48px; }
+  .action-hint { min-height: auto; margin: 11px 0; }
+}
+@media (max-width: 500px) {
+  .hero { display: block; }
+  .progress-card { margin-top: 15px; width: 100%; }
+  .progress-text { margin-bottom: 5px; }
+  .stage-heading { min-height: 49px; padding: 8px 13px; }
+  .stage-heading h2 { font-size: 18px; }
+  .readouts { padding-block: 9px; }
+  .readout > strong { font-size: 18px; }
+  .readout > span { font-size: 11px; }
+  .section-heading { align-items: start; flex-direction: column; }
+  .section-heading h2 { font-size: 24px; }
+  .quiet { min-height: 40px; }
+  th, td { height: 47px; font-size: 13px; }
+  .results { margin-top: 24px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+}
+.field-control { position: relative; }
+.field-control input {
+  width: 100%; height: 100%; inset: 0; margin: 0; clip: auto; opacity: 0; cursor: pointer;
+}
+.primary[aria-disabled="true"] { background: #e2eae0; border-color: #d2dfd2; color: #53695c; cursor: default; }
+.primary[aria-disabled="true"] > span:last-child { color: #53695c; }
+
+.brand { text-decoration: none; }
+.library-hero {
+  display: grid; grid-template-columns: 1fr 290px; align-items: center; gap: clamp(24px, 7vw, 110px);
+  margin-top: 25px; padding: clamp(25px, 5vw, 62px);
+  border: 1px solid #254e41; border-radius: 20px; color: #f5f8ef;
+  background: radial-gradient(ellipse at 92% 20%, #285d49, transparent 67%), #143e33;
+}
+.library-course { font-size: 14px; font-weight: 690; letter-spacing: .045em; color: #d5edbd; }
+.library-hero h1 { margin-top: 10px; font-size: clamp(34px, 5.1vw, 64px); letter-spacing: -.045em; line-height: 1.13; }
+.library-intro { font-size: 15px; color: #e2eddf; max-width: 33em; margin-top: 13px; line-height: 1.65; }
+.unit-nav { display: grid; gap: 7px; }
+.unit-nav a {
+  display: grid; grid-template-columns: 36px 1fr auto; align-items: center; min-height: 42px; gap: 10px;
+  padding: 6px 13px; border: 1px solid #638575; border-radius: 8px; text-decoration: none; font-size: 14px;
+}
+.unit-nav a:hover, .unit-nav a:focus-visible { background: #315c4b; outline-color: var(--accent); }
+.unit-nav a strong, .unit-nav a span:last-child { color: #daf1c1; }
+.library-unit { margin-top: 33px; scroll-margin-top: 15px; }
+.unit-heading { display: flex; align-items: baseline; gap: 12px; margin-bottom: 13px; }
+.unit-heading h2 { color: var(--deep); font-size: clamp(23px, 3vw, 30px); }
+.unit-heading p { font-size: 14px; color: var(--muted); }
+.unit-code { color: var(--jade); margin-right: 8px; font-variant-numeric: tabular-nums; }
+.lab-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.lab-card {
+  text-decoration: none; display: flex; flex-direction: column; overflow: hidden;
+  transition: box-shadow .18s, border-color .18s;
+}
+.lab-card:hover { border-color: #6c9c82; box-shadow: 0 4px 14px #16382b18; }
+.card-art { display: block; width: 100%; aspect-ratio: 780 / 420; background: #f1f4ec; border-bottom: 1px solid var(--rule); }
+.card-copy { padding: 13px 15px 15px; flex: 1; display: flex; flex-direction: column; }
+.card-title { font-weight: 760; color: var(--deep); font-size: 18px; }
+.card-question { margin: 3px 0 9px; color: var(--muted); font-size: 13px; }
+.card-topic { margin-top: auto; color: var(--jade); font-size: 12px; display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+.card-topic span:last-child { font-size: 17px; }
+.library-footer { margin-top: 12px; border-top: 1px solid var(--rule); }
+.lab-breadcrumb { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 14px; padding-top: 18px; color: var(--muted); font-size: 13px; }
+.lab-breadcrumb a { color: var(--jade); font-weight: 720; text-decoration: none; }
+.lab-breadcrumb a:hover { text-decoration: underline; }
+.lab-breadcrumb a span { margin-right: 3px; }
+.extra-hero { padding-top: 16px; }
+#extraScene { display: block; width: 100%; aspect-ratio: 780 / 420; }
+.extra-reading { padding: 11px 21px 13px; min-height: 68px; }
+.extra-reading > span { display: block; font-size: 12px; color: var(--muted); }
+.extra-reading strong { display: block; font-weight: 710; color: var(--deep); }
+.extra-controls h2 { font-size: 22px; }
+.lab-procedure { padding-left: 1.32em; margin: 9px 0 16px; font-size: 14px; color: var(--muted); }
+.lab-procedure li { margin-bottom: 3px; }
+#extraParameters { display: grid; gap: 9px; margin-bottom: 15px; }
+.lab-control { display: grid; gap: 4px; font-size: 13px; font-weight: 680; }
+.lab-control select {
+  color: var(--ink); font: inherit; border: 1px solid #bccfc0; background-color: #f3f7ef;
+  border-radius: 8px; padding: 6px 9px; min-height: 41px; width: 100%;
+}
+.lab-control select:focus-visible { outline: 3px solid #397a62; outline-offset: 3px; }
+.extra-data { overflow: auto; max-height: 320px; }
+.extra-data thead { position: sticky; top: 0; }
+.extra-data th, .extra-data td { padding-inline: 4px; overflow-wrap: anywhere; }
+.extra-data td:last-child { font-weight: 550; }
+.extra-data .empty-row { color: var(--muted); }
+#extraChart { width: 100%; height: 231px; display: block; }
+#extraResultsGrid.table-only { grid-template-columns: minmax(0, 1fr); }
+.lab-plot-points { margin-bottom: 12px; }
+@media (max-width: 860px) {
+  .library-hero { grid-template-columns: 1fr 210px; }
+  .lab-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .unit-heading { flex-wrap: wrap; column-gap: 10px; row-gap: 0; }
+}
+@media (max-width: 560px) {
+  .library-hero { grid-template-columns: 1fr; margin-top: 15px; gap: 17px; border-radius: 14px; padding: 20px; }
+  .library-intro { font-size: 14px; }
+  .unit-nav { grid-template-columns: repeat(3, 1fr); }
+  .unit-nav a { grid-template-columns: 1fr; gap: 1px; padding: 5px; text-align: center; font-size: 11px; }
+  .unit-nav a span:last-child { display: none; }
+  .unit-nav a strong { font-size: 13px; }
+  .lab-grid { grid-template-columns: 1fr; }
+  .library-unit { margin-top: 24px; }
+  .unit-heading { margin-bottom: 9px; }
+  .extra-reading { padding: 9px 12px; min-height: 52px; font-size: 14px; }
+  .lab-breadcrumb { padding-top: 13px; font-size: 12px; }
+  .extra-hero { padding-top: 11px; }
+  .extra-data th, .extra-data td { font-size: 12px; }
+}
+</style>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到实验</a>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="#library">
+        <span class="brand-icon" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>IGCSE <span class="brand-divider" aria-hidden="true">/</span> 物理实验</span>
+      </a>
+      <button id="helpButton" type="button" class="quiet"><span class="help-icon" aria-hidden="true">?</span> 实验说明</button>
+    </div>
+  </header>
+
+  <main class="wrap" id="main" tabindex="-1">
+    <div id="libraryView" class="library-view">
+  <div class="library-hero">
+    <div>
+      <p class="library-course">Edexcel International GCSE</p>
+      <h1 tabindex="-1" id="libraryTitle">物理仿真实验室</h1>
+      <p class="library-intro">按教材单元选择实验。调节变量、记录读数，再用数据检验你的预测。</p>
+    </div>
+    <nav class="unit-nav" aria-label="跳转到单元">
+      <a href="#unit-U6"><strong>U6</strong><span>磁学与电磁学</span><span aria-hidden="true">↓</span></a>
+      <a href="#unit-U7"><strong>U7</strong><span>放射性与粒子</span><span aria-hidden="true">↓</span></a>
+      <a href="#unit-U8"><strong>U8</strong><span>天体物理</span><span aria-hidden="true">↓</span></a>
+    </nav>
+  </div>
+  <div id="labLibrary"></div>
+  <footer class="site-footer library-footer">
+    <p>教材目录依据 CGP <i>Edexcel International GCSE Physics Complete Revision &amp; Practice</i>，ISBN 9781789080841。页码为书内页码。</p>
+  </footer>
+</div>
+
+<div id="extraLabView" hidden>
+  <div class="lab-breadcrumb">
+    <a href="#library"><span aria-hidden="true">←</span> 全部实验</a>
+    <span id="extraTopic"></span>
+  </div>
+  <div class="hero extra-hero">
+    <div><h1 id="extraTitle" tabindex="-1"></h1><p id="extraQuestion"></p></div>
+  </div>
+  <section class="bench" aria-label="实验操作">
+    <div class="stage panel">
+      <div class="stage-heading"><h2>实验台</h2></div>
+      <div class="stage-view">
+        <canvas id="extraScene" role="img"></canvas>
+      </div>
+      <div class="extra-reading">
+        <span>最近一次读数</span>
+        <strong id="extraReadout" aria-live="polite"></strong>
+      </div>
+    </div>
+    <div class="controls panel extra-controls">
+      <h2>操作步骤</h2>
+      <ol id="extraProcedure" class="lab-procedure"></ol>
+      <form id="extraParameters" aria-label="实验变量"></form>
+      <button id="extraMeasure" type="button" class="primary"><span id="extraActionLabel"></span><span aria-hidden="true">→</span></button>
+    </div>
+  </section>
+
+  <section class="results" aria-labelledby="extraResultsTitle">
+    <div class="section-heading">
+      <div><h2 id="extraResultsTitle">实验记录</h2><p id="extraRecordCount"></p></div>
+      <div class="result-actions">
+        <button id="extraExport" type="button" class="quiet" disabled><span aria-hidden="true">↓</span> 导出 CSV</button>
+        <button id="extraReset" type="button" class="quiet">重新开始</button>
+      </div>
+    </div>
+    <div id="extraResultsGrid" class="results-grid">
+      <div class="data-card panel extra-data">
+        <table id="extraTable">
+          <caption class="sr-only">实验读数</caption>
+          <thead><tr></tr></thead><tbody></tbody>
+        </table>
+      </div>
+      <div id="extraChartCard" class="chart-card panel">
+        <h3 id="extraChartHeading"></h3>
+        <canvas id="extraChart" role="img" aria-label="实验结果图"></canvas>
+      </div>
+    </div>
+    <div class="conclusion-card panel">
+      <label for="extraConclusion"><strong>用数据写结论</strong></label>
+      <p id="extraPrompt"></p>
+      <textarea id="extraConclusion" maxlength="1200" rows="3" aria-describedby="extraPrompt" placeholder="用你的读数或观察结果解释……"></textarea>
+    </div>
+  </section>
+  <footer class="site-footer">
+    <p>读数来自简化仿真模型。</p>
+  </footer>
+</div>
+
+<dialog id="extraResetDialog" aria-labelledby="extraResetTitle">
+  <form method="dialog">
+    <div class="dialog-heading"><h2 id="extraResetTitle">重新开始实验？</h2></div>
+    <p>本实验的读数和结论会清空。你可以先导出 CSV。</p>
+    <div class="dialog-actions">
+      <button type="submit" class="quiet" autofocus>继续实验</button>
+      <button type="button" id="extraConfirmReset" class="primary">重新开始</button>
+    </div>
+  </form>
+</dialog>
+
+    <div id="originalLab" hidden>
+    <div class="lab-breadcrumb"><a href="#library"><span aria-hidden="true">←</span> 全部实验</a><span>U6 · Electromagnetism · p. 116</span></div>
+    <div class="hero">
+      <div>
+        <h1 id="originalTitle" tabindex="-1">电磁铁实验室</h1>
+        <p>线圈匝数会怎样改变电磁铁的吸力？</p>
+      </div>
+      <div class="progress-card">
+        <div class="progress-text"><span>实验进度</span><strong id="progressLabel">0 / 9</strong></div>
+        <div id="progressMeter" class="progress-meter" role="progressbar" aria-label="实验进度" aria-valuemin="0" aria-valuemax="9" aria-valuenow="0"></div>
+      </div>
+    </div>
+
+    <section class="bench" aria-label="电磁铁实验台">
+      <div class="stage panel">
+        <div class="stage-heading">
+          <h2>实验台</h2>
+          <label class="field-control">
+            <input type="checkbox" id="fieldToggle">
+            <span class="toggle" aria-hidden="true"></span>
+            <span>磁场线</span>
+          </label>
+        </div>
+        <div class="stage-view">
+          <canvas id="scene" role="img" aria-label="电池、电阻、铁芯线圈和回形针构成的实验装置"></canvas>
+        </div>
+        <div class="readouts">
+          <div class="readout">
+            <span>电路状态</span>
+            <strong id="powerState"><i class="status-dot" aria-hidden="true"></i><span id="powerLabel">断电</span></strong>
+          </div>
+          <div class="readout">
+            <span id="currentTitle">线圈电流</span>
+            <strong id="currentReadout" class="numeric">— <small>A</small></strong>
+          </div>
+          <div class="readout">
+            <span id="countTitle">提起的回形针</span>
+            <strong id="countReadout" class="numeric">— <small>枚</small></strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls panel">
+        <div class="round-tag" id="roundTag">第 1 轮 · 第 1 次</div>
+        <h2 id="controlHeading">选择线圈</h2>
+        <p id="coilInstruction" class="subtle">先用 60 匝线圈开始测量。</p>
+        <fieldset id="coilPicker">
+          <legend class="sr-only">选择线圈匝数</legend>
+          <button type="button" class="coil-choice" data-turns="60" aria-pressed="true"><strong>60</strong><span>匝</span></button>
+          <button type="button" class="coil-choice" data-turns="120" aria-pressed="false"><strong>120</strong><span>匝</span></button>
+          <button type="button" class="coil-choice" data-turns="180" aria-pressed="false"><strong>180</strong><span>匝</span></button>
+        </fieldset>
+        <div id="instructions">
+          <ol class="steps" aria-label="测量步骤">
+            <li data-step="0" aria-current="step"><span>1</span>通电</li>
+            <li data-step="1"><span>2</span>提起</li>
+            <li data-step="2"><span>3</span>断电</li>
+            <li data-step="3"><span>4</span>记录</li>
+          </ol>
+          <p id="actionHint" class="action-hint" aria-live="polite">让铁芯接触回形针，再接通电路。</p>
+          <button type="button" id="primaryAction" class="primary"><span id="actionLabel">接通电路</span><span aria-hidden="true">→</span></button>
+        </div>
+        <a class="primary complete-link" id="reviewLink" href="#results" hidden>查看结果 <span aria-hidden="true">↓</span></a>
+      </div>
+    </section>
+
+    <section id="results" class="results" aria-labelledby="resultsHeading">
+      <div class="section-heading">
+        <div>
+          <h2 id="resultsHeading">实验记录</h2>
+          <p>每种匝数测 3 次。图上显示各匝数已记录读数的平均值。</p>
+        </div>
+        <div class="result-actions">
+          <button id="exportButton" type="button" class="quiet" disabled><span aria-hidden="true">↓</span> 导出 CSV</button>
+          <button id="resetButton" type="button" class="quiet">重新开始</button>
+        </div>
+      </div>
+      <div class="results-grid">
+        <div class="data-card panel">
+          <table id="dataTable">
+            <caption class="sr-only">三轮测量中提起的回形针数</caption>
+            <thead>
+              <tr><th scope="col">线圈</th><th scope="col">第 1 轮</th><th scope="col">第 2 轮</th><th scope="col">第 3 轮</th><th scope="col">平均</th></tr>
+            </thead>
+            <tbody>
+              <tr data-row="60"><th scope="row">60 <span>匝</span></th><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr data-row="120"><th scope="row">120 <span>匝</span></th><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr data-row="180"><th scope="row">180 <span>匝</span></th><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+            </tbody>
+          </table>
+          <p class="table-note" id="nextOrder">第 1 轮顺序：60 → 120 → 180 匝</p>
+        </div>
+        <div class="chart-card panel">
+          <h3>平均提起的回形针数 <span>（枚）</span></h3>
+          <canvas id="plot" role="img" aria-label="平均回形针数与线圈匝数的关系图，暂无记录"></canvas>
+        </div>
+      </div>
+      <div class="conclusion-card panel">
+        <label for="conclusion"><strong>用数据写结论</strong></label>
+        <p id="conclusionHint">比较两种匝数的平均回形针数。为什么换线圈时要让电流保持接近？</p>
+        <textarea id="conclusion" maxlength="1200" rows="3" aria-describedby="conclusionHint" placeholder="完成测量后，用你的数据解释……"></textarea>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <p>读数来自简化仿真模型。实物实验需在老师指导下进行，每次通电最多 5 秒，断电后至少间隔 20 秒。</p>
+    </footer>
+    </div>
+  </main>
+
+  <dialog id="helpDialog" aria-labelledby="helpTitle">
+    <form method="dialog">
+      <div class="dialog-heading"><h2 id="helpTitle">实验说明</h2><button class="quiet" type="submit" aria-label="关闭实验说明">关闭</button></div>
+      <ol class="help-list">
+        <li>按提示更换 60、120 或 180 匝线圈。同一组实验始终使用同一根铁芯、同一电池组和限流电阻。</li>
+        <li>通电后等约 1 秒，再竖直提起铁芯。悬空 1 秒后观察仍挂着的回形针。</li>
+        <li>断电后回形针落回盘里。点击「记录读数」，把刚才的个数填进表格。</li>
+        <li>完成三轮后，用图表比较平均值，并在实验记录下方写出结论。</li>
+      </ol>
+      <p class="dialog-note">打开「磁场线」可以观察通电线圈周围的示意磁场。每次测量有少量模拟波动，代表回形针堆放和接触的差异。</p>
+    </form>
+  </dialog>
+  <dialog id="resetDialog" aria-labelledby="resetTitle">
+    <form method="dialog">
+      <div class="dialog-heading"><h2 id="resetTitle">重新开始实验？</h2></div>
+      <p>当前测量记录和结论会清空。你可以先导出数据。</p>
+      <div class="dialog-actions">
+        <button type="submit" class="quiet" autofocus>继续实验</button>
+        <button type="button" id="confirmReset" class="primary">重新开始</button>
+      </div>
+    </form>
+  </dialog>
+  <script>const LabModel = (() => {
+  const COILS = Object.freeze([60, 120, 180]);
+  const ORDER = Object.freeze([60, 120, 180, 120, 180, 60, 180, 60, 120]);
+  const MAX_CLIPS = 20;
+  const VOLTAGE = 3;
+  const LIMIT_RESISTANCE = 6.8;
+  const BATTERY_RESISTANCE = 0.16;
+  const WIRE_DIAMETER = 0.4;
+  const TURN_PITCH_RADIAL = 0.44;
+  const FIRST_LAYER_RADIUS = 3.55;
+  const TURNS_PER_LAYER = 60;
+  const COPPER_RESISTIVITY = 0.0172; // Ω·mm²/m
+  const LEAD_LENGTH = 0.2;
+  const PLACEMENT_VARIATIONS = [
+    [-1, 0, 0],
+    [-1, 0, 1],
+    [0, 0, 1],
+    [-1, -1, 1],
+    [-1, 1, 1],
+  ];
+
+  function newSeed() {
+    return Math.floor(Math.random() * 2 ** 32);
+  }
+
+  function currentFor(turns) {
+    if (!COILS.includes(turns)) return null;
+    let wireLength = LEAD_LENGTH;
+    for (let layer = 0; layer < turns / TURNS_PER_LAYER; layer++) {
+      const radius = FIRST_LAYER_RADIUS + layer * TURN_PITCH_RADIAL;
+      wireLength += (2 * Math.PI * radius * TURNS_PER_LAYER) / 1000;
+    }
+    const wireArea = Math.PI * (WIRE_DIAMETER / 2) ** 2;
+    const coilResistance = (COPPER_RESISTIVITY * wireLength) / wireArea;
+    const current = VOLTAGE / (LIMIT_RESISTANCE + BATTERY_RESISTANCE + coilResistance);
+    return Math.round(current * 1000) / 1000;
+  }
+
+  function placementOffsets(seed, turns) {
+    // Derive a different shuffle for each coil, preserving reproducible variation.
+    let mixed = Math.imul(seed ^ turns, 0x45d9f3b);
+    mixed = Math.imul(mixed ^ (mixed >>> 16), 0x45d9f3b);
+    mixed = (mixed ^ (mixed >>> 16)) >>> 0;
+    const offsets = [...PLACEMENT_VARIATIONS[mixed % PLACEMENT_VARIATIONS.length]];
+    const lastSwap = (mixed >>> 6) % 3;
+    const middleSwap = (mixed >>> 11) % 2;
+    [offsets[2], offsets[lastSwap]] = [offsets[lastSwap], offsets[2]];
+    [offsets[1], offsets[middleSwap]] = [offsets[middleSwap], offsets[1]];
+    return offsets;
+  }
+
+  function measure(seed, turns, round) {
+    const current = currentFor(turns);
+    const ampereTurns = turns * current;
+    // A classroom response curve: pickup rises with NI and gradually saturates.
+    const expected = 14 * (1 - Math.exp(-Math.max(0, ampereTurns - 13) / 60));
+    const count = Math.max(
+      0,
+      Math.min(MAX_CLIPS, Math.round(expected) + placementOffsets(seed, turns)[round - 1]),
+    );
+    return { turns, round, count, current };
+  }
+
+  function fromRecords(seed, records) {
+    const index = records.length;
+    const complete = index === ORDER.length;
+    return {
+      records,
+      seed,
+      phase: "ready",
+      sample: null,
+      index,
+      turns: complete ? null : ORDER[index],
+      round: complete ? null : Math.floor(index / COILS.length) + 1,
+      complete,
+    };
+  }
+
+  function create(seed, savedRecords) {
+    const normalizedSeed = Number.isSafeInteger(seed) ? seed >>> 0 : newSeed();
+    const records = [];
+    if (Array.isArray(savedRecords)) {
+      for (const saved of savedRecords.slice(0, ORDER.length)) {
+        const turns = ORDER[records.length];
+        const round = Math.floor(records.length / COILS.length) + 1;
+        if (!saved || saved.turns !== turns || saved.round !== round ||
+            !Number.isInteger(saved.count) || saved.count < 0 || saved.count > MAX_CLIPS ||
+            !Number.isFinite(saved.current) || saved.current <= 0 || saved.current > 1) {
+          break;
+        }
+        records.push({ turns, round, count: saved.count, current: saved.current });
+      }
+    }
+    return fromRecords(normalizedSeed, records);
+  }
+
+  function act(state, action) {
+    if (action === "reset") return create();
+    if (state.complete) return state;
+    switch (action) {
+      case "power":
+        return state.phase === "ready" ? { ...state, phase: "powered" } : state;
+      case "lift":
+        return state.phase === "powered"
+          ? { ...state, phase: "lifted", sample: measure(state.seed, state.turns, state.round) }
+          : state;
+      case "off":
+        if (state.phase === "lifted") return { ...state, phase: "off" };
+        if (state.phase === "powered") return { ...state, phase: "ready" };
+        return state;
+      case "record":
+        return state.phase === "off"
+          ? fromRecords(state.seed, [...state.records, state.sample])
+          : state;
+      case "retry":
+        return state.phase === "off" ? { ...state, phase: "ready", sample: null } : state;
+      default:
+        return state;
+    }
+  }
+
+  function summary(state) {
+    return COILS.map((turns) => {
+      const counts = [null, null, null];
+      for (const record of state.records) {
+        if (record.turns === turns) counts[record.round - 1] = record.count;
+      }
+      const measured = counts.filter((count) => count !== null);
+      const mean = measured.length
+        ? measured.reduce((sum, count) => sum + count, 0) / measured.length
+        : null;
+      return { turns, counts, mean };
+    });
+  }
+
+  return Object.freeze({ COILS, ORDER, MAX_CLIPS, create, act, summary, currentFor });
+})();
+
+function createLabScene(canvas) {
+  const context = canvas.getContext("2d");
+  const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const width = 780;
+  const height = 420;
+  const magnetX = 418;
+  const restingHead = 330;
+  const travel = 104;
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+  const palette = {
+    ink: "#233c36",
+    label: "#40594f",
+    wire: "#62746b",
+    live: "#278362",
+    steel: "#677872",
+    copper: "#ac613a",
+    copperLight: "#db9458",
+    cream: "#f4f5ee",
+    jade: "#16483b"
+  };
+
+  const pile = [
+    [367, 323, -1.10], [426, 343, 1.44], [389, 343, 1.16], [463, 344, -0.72],
+    [412, 313, -1.13], [429, 327, 1.88], [445, 314, 0.90], [348, 338, -1.85],
+    [455, 330, 0.25], [409, 338, -1.20], [387, 321, 0.90], [495, 338, -1.14],
+    [475, 322, 0.82], [366, 345, 1.24], [453, 350, 1.58], [324, 342, 0.82],
+    [510, 349, 1.31], [406, 350, 1.23], [434, 353, -1.40], [484, 351, 1.41]
+  ];
+
+  let state = { turns: 60, powered: false, lifted: false, count: 0, field: false };
+  let headRise = 0;
+  const attached = pile.map(() => 0);
+  let animation = 0;
+  let previousTime = 0;
+  let clipTime = 0;
+
+  function line(points, stroke, weight = 1) {
+    context.beginPath();
+    context.moveTo(points[0][0], points[0][1]);
+    for (const [x, y] of points.slice(1)) context.lineTo(x, y);
+    context.strokeStyle = stroke;
+    context.lineWidth = weight;
+    context.stroke();
+  }
+
+  function rounded(x, y, w, h, radius, fill, stroke, weight = 1) {
+    context.beginPath();
+    context.roundRect(x, y, w, h, radius);
+    if (fill) {
+      context.fillStyle = fill;
+      context.fill();
+    }
+    if (stroke) {
+      context.strokeStyle = stroke;
+      context.lineWidth = weight;
+      context.stroke();
+    }
+  }
+
+  function circle(x, y, radius, fill, stroke, weight = 1) {
+    context.beginPath();
+    context.arc(x, y, radius, 0, 2 * Math.PI);
+    if (fill) {
+      context.fillStyle = fill;
+      context.fill();
+    }
+    if (stroke) {
+      context.strokeStyle = stroke;
+      context.lineWidth = weight;
+      context.stroke();
+    }
+  }
+
+  function text(value, x, y, { size = 16, align = "center", weight = 600, fill = palette.label } = {}) {
+    context.fillStyle = fill;
+    context.font = `${weight} ${size}px "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif`;
+    context.textAlign = align;
+    context.textBaseline = "middle";
+    context.fillText(value, x, y);
+  }
+
+  function horizontalGradient(x, w, stops) {
+    const gradient = context.createLinearGradient(x, 0, x + w, 0);
+    for (const [offset, color] of stops) gradient.addColorStop(offset, color);
+    return gradient;
+  }
+
+  function tray() {
+    context.fillStyle = "#b5c2b730";
+    context.beginPath();
+    context.ellipse(magnetX, 374, 163, 10, 0, 0, Math.PI * 2);
+    context.fill();
+    context.beginPath();
+    context.moveTo(260, 345);
+    context.quadraticCurveTo(263, 333, 286, 321);
+    context.lineTo(550, 321);
+    context.quadraticCurveTo(574, 331, 576, 344);
+    context.lineTo(565, 365);
+    context.quadraticCurveTo(561, 373, 548, 373);
+    context.lineTo(286, 373);
+    context.quadraticCurveTo(271, 373, 268, 365);
+    context.closePath();
+    context.fillStyle = "#e7ede4";
+    context.fill();
+    context.strokeStyle = "#879b8e";
+    context.lineWidth = 1.5;
+    context.stroke();
+    context.beginPath();
+    context.moveTo(274, 348);
+    context.quadraticCurveTo(286, 326, 301, 326);
+    context.lineTo(534, 326);
+    context.quadraticCurveTo(553, 327, 565, 348);
+    context.quadraticCurveTo(416, 363, 274, 348);
+    context.fillStyle = "#f8faf5";
+    context.fill();
+  }
+
+  function trayFront() {
+    context.beginPath();
+    context.moveTo(264, 351);
+    context.quadraticCurveTo(414, 367, 572, 351);
+    context.lineTo(564, 366);
+    context.quadraticCurveTo(561, 372, 549, 373);
+    context.lineTo(287, 373);
+    context.quadraticCurveTo(275, 373, 270, 365);
+    context.closePath();
+    context.fillStyle = "#d5e0d5";
+    context.fill();
+    context.strokeStyle = "#95a89a";
+    context.lineWidth = 1.5;
+    context.stroke();
+  }
+
+  function paperclip(x, y, angle, hanging) {
+    context.save();
+    context.translate(x, y);
+    context.rotate(angle);
+    context.beginPath();
+    context.moveTo(3.7, 5.0);
+    context.lineTo(3.7, -4.6);
+    context.quadraticCurveTo(3.7, -8.8, 0, -8.8);
+    context.quadraticCurveTo(-4.2, -8.8, -4.2, -4.5);
+    context.lineTo(-4.2, 5.1);
+    context.quadraticCurveTo(-4.2, 9, -0.9, 9);
+    context.quadraticCurveTo(1.1, 9, 1.1, 5.8);
+    context.lineTo(1.1, -4.3);
+    context.quadraticCurveTo(1.1, -5.6, -0.3, -5.6);
+    context.quadraticCurveTo(-1.6, -5.6, -1.6, -4.3);
+    context.lineTo(-1.6, 4);
+    context.strokeStyle = hanging ? "#314e45" : "#526660";
+    context.lineWidth = hanging ? 1.7 : 1.4;
+    context.stroke();
+    context.restore();
+  }
+
+  function clips(head) {
+    for (const [index, [x, y, angle]] of pile.entries()) {
+      if (attached[index] < 0.04) paperclip(x, y, angle, false);
+    }
+    trayFront();
+    for (const [index, [x, y, angle]] of pile.entries()) {
+      const ratio = attached[index];
+      if (ratio < 0.04) continue;
+      const slot = [0, -1, 1, -2, 2][index % 5];
+      const tier = Math.floor(index / 5);
+      const targetX = magnetX + slot * (13 + tier * 2);
+      const targetY = head + 8 + tier * 15;
+      const mix = (from, to) => from + (to - from) * ratio;
+      const tilt = slot * (0.055 + tier * 0.025);
+      paperclip(mix(x, targetX), mix(y, targetY), mix(angle, tilt), true);
+    }
+  }
+
+  function circuit(head, timestamp) {
+    const live = state.powered ? palette.live : palette.wire;
+    const loops = [
+      [[142, 197], [142, 109], [193, 109]],
+      [[259, 109], [316, 109], [316, head - 41], [377, head - 41]],
+      [[459, head - 115], [567, head - 115], [567, 229], [616, 229]],
+      [[663, 229], [682, 229], [682, 385], [142, 385], [142, 328]]
+    ];
+    for (const points of loops) {
+      line(points, "#f4f5ee", 7);
+      line(points, live, state.powered ? 3 : 2.4);
+    }
+
+    if (state.powered && !motion.matches) {
+      const source = [...loops[0], ...loops[1], [459, head - 115], ...loops[2].slice(1), ...loops[3]];
+      let length = 0;
+      const segments = [];
+      const coilIndex = loops[0].length + loops[1].length - 1;
+      for (let index = 0; index < source.length - 1; index++) {
+        const [x, y] = source[index];
+        const [endX, endY] = source[index + 1];
+        const segment = Math.hypot(endX - x, endY - y);
+        segments.push({ x, y, endX, endY, segment, start: length, visible: index !== coilIndex });
+        length += segment;
+      }
+      for (let distance = timestamp * 0.145 % 76; distance < length; distance += 76) {
+        const step = segments.find(item => distance >= item.start && distance < item.start + item.segment);
+        if (!step?.visible) continue;
+        const fraction = (distance - step.start) / step.segment;
+        circle(step.x + (step.endX - step.x) * fraction,
+          step.y + (step.endY - step.y) * fraction, 2.7, "#82cbaa");
+      }
+    }
+
+    rounded(192, 96, 68, 26, 5, "#f4eee1", "#9a8462", 1.4);
+    for (const [index, color] of ["#497257", "#8b795f", "#d99462"].entries()) {
+      rounded(209 + index * 11, 97.5, 5, 23, 1.3, color);
+    }
+    text("限流电阻 · 6.8 Ω", 225, 77);
+
+    rounded(87, 197, 110, 132, 12, "#e5eae2", "#75877b", 1.4);
+    rounded(137, 191, 10, 11, 3, "#b7704e", "#985437");
+    rounded(137, 326, 10, 8, 3, "#53675d");
+    for (const x of [103, 146]) {
+      rounded(x + 9, 208, 15, 7, 2, "#99aaa0");
+      rounded(x, 213, 33, 99, 5, horizontalGradient(x, 33, [
+        [0, "#2e5044"], [0.46, "#547468"], [1, "#24463a"]
+      ]));
+      rounded(x + 0.5, 213.5, 32, 31, [5, 5, 0, 0], "#c88155");
+      text("+", x + 16.5, 229, { size: 17, fill: "#fff9ef" });
+      text("AA", x + 16.5, 267, { size: 13, weight: 700, fill: "#f2f8ef" });
+      text("−", x + 16.5, 297, { size: 16, fill: "#f2f8ef" });
+    }
+    text("2 节 AA · 3 V", 142, 350);
+
+    rounded(605, 208, 68, 39, 7, "#e6ede4", "#7e9284", 1.4);
+    line([[616, 229], state.powered ? [663, 229] : [654, 216]], live, 2.4);
+    circle(616, 229, 3.6, "#f5f7f0", live, 1.8);
+    circle(663, 229, 3.6, "#f5f7f0", live, 1.8);
+    text("开关", 639, 269);
+  }
+
+  function arrow(x, y, theta, color) {
+    line([
+      [x - 6 * Math.cos(theta - 0.55), y - 6 * Math.sin(theta - 0.55)],
+      [x, y],
+      [x - 6 * Math.cos(theta + 0.55), y - 6 * Math.sin(theta + 0.55)]
+    ], color, 1.4);
+  }
+
+  function magneticField(head) {
+    const top = head - 155;
+    const bottom = head - 3;
+    for (const side of [-1, 1]) {
+      for (const [index, reach] of [83, 114, 145].entries()) {
+        const color = ["#3a9478a8", "#589f86a1", "#6ba08a8d"][index];
+        const x = magnetX + reach * side;
+        context.beginPath();
+        context.moveTo(magnetX + side * 6, top + 2);
+        context.bezierCurveTo(x, top - 37 - index * 3, x, bottom + 30 + index * 5, magnetX + side * 6, bottom);
+        context.strokeStyle = color;
+        context.lineWidth = 1.6;
+        context.stroke();
+        arrow(magnetX + (0.75 * reach + 1.5) * side, (top + bottom) / 2, Math.PI / 2, color);
+      }
+    }
+  }
+
+  function magnet(head) {
+    const top = head - 155;
+    const coilTop = head - 121;
+    const coilHeight = 86;
+    const layers = state.turns >= 180 ? 3 : state.turns >= 120 ? 2 : 1;
+    const coilWidth = 65 + 9 * (layers - 1);
+    const coilX = magnetX - coilWidth / 2;
+    rounded(magnetX - 15, top, 30, 146, 4, horizontalGradient(magnetX - 15, 30, [
+      [0, "#53665e"], [0.16, "#a9b5ae"], [0.45, "#dce5dc"], [0.7, "#b0bdb3"], [1, "#697e73"]
+    ]), "#51675b", 1.3);
+    for (let index = 0; index < 4; index++) {
+      const y = top + 8 + index * 5;
+      line([[magnetX - 10, y + 2], [magnetX + 10, y - 2]], "#74877d", 1.1);
+    }
+
+    rounded(coilX - 4, coilTop - 3, coilWidth + 8, coilHeight + 8, 9, "#d9d0b3", "#9f9c79", 1.1);
+    rounded(coilX, coilTop, coilWidth, coilHeight, 7, horizontalGradient(coilX, coilWidth, [
+      [0, "#814827"], [0.2, "#aa653e"], [0.47, "#d49562"], [0.7, "#bd794b"], [1, "#85512f"]
+    ]));
+    const ridges = 9 + 3 * (layers - 1);
+    for (let index = 0; index < ridges; index++) {
+      const y = coilTop + 4 + (coilHeight - 8) * index / (ridges - 1);
+      context.beginPath();
+      context.moveTo(coilX + 2, y);
+      context.bezierCurveTo(coilX + coilWidth * 0.22, y + 5, coilX + coilWidth * 0.74, y + 4, coilX + coilWidth - 2, y - 0.7);
+      context.strokeStyle = "#8b4c2e";
+      context.lineWidth = 2.4;
+      context.stroke();
+      context.beginPath();
+      context.moveTo(coilX + 6, y - 0.8);
+      context.quadraticCurveTo(magnetX, y + 5.3, coilX + coilWidth - 6, y - 1);
+      context.strokeStyle = "#e0a16b";
+      context.lineWidth = 1.3;
+      context.stroke();
+    }
+    line([[377, head - 41], [coilX + 3, head - 41]], palette.copper, 3.3);
+    line([[coilX + coilWidth - 3, head - 115], [459, head - 115]], palette.copper, 3.3);
+
+    rounded(magnetX - 35, head - 19, 70, 19, 4, horizontalGradient(magnetX - 35, 70, [
+      [0, "#8c9e94"], [0.1, "#a9b9ae"], [0.78, "#c2cdc4"], [1, "#71887b"]
+    ]), "#51675b", 1.6);
+    line([[magnetX - 29, head - 3], [magnetX + 29, head - 3]], "#83998e", 1.1);
+
+    line([[magnetX - 16, top + 10], [magnetX - 35, top - 6], [magnetX - 72, top - 6]], "#798e81", 1.1);
+    text("铁芯", magnetX - 80, top - 6, { align: "right" });
+    text(`${state.turns} 匝`, magnetX + 81, head - 76, { size: 17, align: "left", fill: "#754a36" });
+    line([[coilX + coilWidth + 3, head - 76], [magnetX + 71, head - 76]], "#ac8b71", 1.1);
+    if (state.field && state.powered) {
+      text("N", magnetX + 29, top + 7, { size: 16, fill: palette.live });
+      text("S", magnetX + 47, head - 7, { size: 16, fill: palette.live });
+    }
+  }
+
+  function dimension(head) {
+    if (headRise < 0.35) return;
+    const x = 533;
+    context.save();
+    context.globalAlpha = clamp((headRise - 0.35) * 3, 0, 1);
+    context.setLineDash([3, 4]);
+    line([[x, head + 4], [x, restingHead]], "#8ba497", 1.3);
+    context.setLineDash([]);
+    line([[x - 6, head + 4], [x + 6, head + 4]], "#8ba497", 1.3);
+    line([[x - 6, restingHead], [x + 6, restingHead]], "#8ba497", 1.3);
+    text("10 cm", x + 12, (head + restingHead) / 2, { align: "left", size: 14 });
+    context.restore();
+  }
+
+  function draw(timestamp) {
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return;
+    const density = Math.min(window.devicePixelRatio || 1, 2);
+    const drawWidth = Math.max(1, Math.round(rect.width * density));
+    const drawHeight = Math.max(1, Math.round(rect.height * density));
+    if (canvas.width !== drawWidth || canvas.height !== drawHeight) {
+      canvas.width = drawWidth;
+      canvas.height = drawHeight;
+    }
+    context.setTransform(1, 0, 0, 1, 0, 0);
+    context.fillStyle = palette.cream;
+    context.fillRect(0, 0, drawWidth, drawHeight);
+    const scale = Math.min(drawWidth / width, drawHeight / height);
+    context.translate((drawWidth - width * scale) / 2, (drawHeight - height * scale) / 2);
+    context.scale(scale, scale);
+    context.lineCap = "round";
+    context.lineJoin = "round";
+
+    context.fillStyle = "#c9d3c7";
+    for (let x = 18; x < width; x += 18) {
+      for (let y = 15; y < height; y += 18) context.fillRect(x, y, 1.15, 1.15);
+    }
+    const glow = context.createRadialGradient(magnetX, 217, 55, magnetX, 217, 300);
+    glow.addColorStop(0, "#fbfcf4b8");
+    glow.addColorStop(1, "#f4f5ee00");
+    context.fillStyle = glow;
+    context.fillRect(0, 0, width, height);
+
+    const head = restingHead - headRise * travel;
+    circuit(head, timestamp);
+    if (state.field && state.powered) magneticField(head);
+    tray();
+    clips(head);
+    magnet(head);
+    dimension(head);
+    text("钢回形针", 579, 358, { size: 15, align: "left" });
+  }
+
+  function render(timestamp) {
+    animation = 0;
+    const delta = previousTime ? Math.min(48, timestamp - previousTime) : 16.7;
+    previousTime = timestamp;
+    const reduced = motion.matches;
+    const goal = state.lifted ? 1 : 0;
+    const riseTime = goal > headRise ? 117 : 95;
+    const approach = (value, target, time) => {
+      if (reduced || Math.abs(target - value) < 0.005) return target;
+      return value + (target - value) * (1 - Math.exp(-delta / time));
+    };
+    headRise = approach(headRise, goal, riseTime);
+    const clipGoal = state.lifted && state.powered ? clamp(Number(state.count) || 0, 0, pile.length) : 0;
+    for (let index = 0; index < attached.length; index++) {
+      attached[index] = approach(attached[index], index < clipGoal ? 1 : 0, index < clipGoal ? 100 : 67);
+    }
+    clipTime += delta;
+    draw(clipTime);
+    if ((state.powered && !reduced) || headRise !== goal ||
+        attached.some((ratio, index) => ratio !== Number(index < clipGoal))) {
+      animation = requestAnimationFrame(render);
+    } else {
+      previousTime = 0;
+    }
+  }
+
+  function schedule() {
+    if (!animation) animation = requestAnimationFrame(render);
+  }
+
+  new ResizeObserver(schedule).observe(canvas);
+  motion.addEventListener?.("change", schedule);
+  schedule();
+  return {
+    update(next) {
+      state = { ...state, ...next };
+      schedule();
+    }
+  };
+}
+
+(() => {
+  const byId = (id) => document.getElementById(id);
+  const storageKey = "igcse-electromagnet-lab-v1";
+  const stage = byId("scene");
+  const plot = byId("plot");
+  const scene = createLabScene(stage);
+  const actionButton = byId("primaryAction");
+  const fieldToggle = byId("fieldToggle");
+  const conclusion = byId("conclusion");
+  const coils = [...document.querySelectorAll("[data-turns]")];
+  const steps = [...document.querySelectorAll("[data-step]")];
+  const rows = new Map([...document.querySelectorAll("[data-row]")].map(
+    (row) => [Number(row.dataset.row), [...row.querySelectorAll("td")]],
+  ));
+  const rounds = [0, 1, 2].map((round) => LabModel.ORDER.slice(round * 3, round * 3 + 3));
+  const meter = byId("progressMeter");
+  const segments = LabModel.ORDER.map(() => meter.appendChild(document.createElement("span")));
+  const phases = {
+    ready: { action: "power", step: 0, label: "接通电路" },
+    powered: { action: "lift", step: 1, label: "提起电磁铁" },
+    lifted: { action: "off", step: 2, label: "断电并观察" },
+    off: { action: "record", step: 3, label: "记录读数" },
+  };
+  const waitDurations = { power: 1000, lift: 1500 };
+
+  let saved;
+  try {
+    saved = JSON.parse(localStorage.getItem(storageKey));
+  } catch {
+    saved = null;
+  }
+  let state = LabModel.create(saved?.seed, saved?.records);
+  let selected = state.turns ?? state.records.at(-1)?.turns ?? LabModel.COILS[0];
+  let timer = null;
+  conclusion.value = typeof saved?.conclusion === "string" ? saved.conclusion.slice(0, 1200) : "";
+  fieldToggle.checked = saved?.field === true;
+
+  function save() {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify({
+        seed: state.seed,
+        records: state.records,
+        conclusion: conclusion.value,
+        field: fieldToggle.checked,
+      }));
+    } catch {
+      // The experiment and CSV export still work if storage is unavailable.
+    }
+  }
+
+  function guidance() {
+    if (state.phase === "ready") {
+      return selected === state.turns
+        ? "铁芯已经接触盘中的回形针。接通电路开始测量。"
+        : `当前是 ${selected} 匝，请换成 ${state.turns} 匝线圈再通电。`;
+    }
+    if (state.phase === "powered") {
+      return timer === null ? "电流已稳定。把铁芯竖直提起约 10 cm。" : "已通电，等待约 1 秒。";
+    }
+    if (state.phase === "lifted") {
+      return timer === null ? "读数已显示。断电，观察回形针落回盘中。" : "提起铁芯，悬空约 1 秒后读数。";
+    }
+    return `刚才提起了 ${state.sample.count} 枚回形针。把读数填入本轮记录。`;
+  }
+
+  function drawPlot(summary) {
+    const context = plot.getContext("2d");
+    if (!context) return;
+    const width = Math.round(plot.clientWidth);
+    const height = Math.round(plot.clientHeight);
+    if (width < 1 || height < 1) return;
+    const scale = window.devicePixelRatio || 1;
+    const pixelWidth = Math.round(width * scale);
+    const pixelHeight = Math.round(height * scale);
+    if (plot.width !== pixelWidth || plot.height !== pixelHeight) {
+      plot.width = pixelWidth;
+      plot.height = pixelHeight;
+    }
+    context.setTransform(pixelWidth / width, 0, 0, pixelHeight / height, 0, 0);
+    context.clearRect(0, 0, width, height);
+    const top = 20;
+    const bottom = height - 53;
+    const left = 31;
+    const right = width - 13;
+    const maximum = Math.max(12, Math.ceil(Math.max(...summary.map((item) => item.mean ?? 0)) / 4) * 4);
+    const yPosition = (value) => bottom - (bottom - top) * value / maximum;
+    const xPosition = (index) => left + (right - left) * (index + 1) / 4;
+    const font = '500 12px "PingFang SC", "Microsoft YaHei", system-ui, sans-serif';
+
+    function line(x1, y1, x2, y2, color) {
+      context.strokeStyle = color;
+      context.beginPath();
+      context.moveTo(x1, y1);
+      context.lineTo(x2, y2);
+      context.stroke();
+    }
+
+    context.font = font;
+    context.textBaseline = "middle";
+    context.textAlign = "right";
+    context.fillStyle = "#51655c";
+    for (let tick = 0; tick <= 4; tick += 1) {
+      const value = maximum * tick / 4;
+      const y = yPosition(value);
+      line(left, y, right, y, tick ? "#dde7db" : "#829c8d");
+      context.fillText(String(value), left - 8, y);
+    }
+    line(left, top, left, bottom, "#829c8d");
+
+    context.textAlign = "center";
+    for (const [index, item] of summary.entries()) {
+      const x = xPosition(index);
+      context.fillStyle = "#51655c";
+      context.fillText(String(item.turns), x, bottom + 16);
+      if (item.mean === null) continue;
+      const y = yPosition(item.mean);
+      line(x, y, x, bottom, "#a3c3a9");
+      context.beginPath();
+      context.arc(x, y, 5.8, 0, Math.PI * 2);
+      context.fillStyle = "#246b50";
+      context.fill();
+      context.fillStyle = "#16483b";
+      context.fillText(item.mean.toFixed(1), x, Math.max(8, y - 15));
+    }
+    context.fillStyle = "#51655c";
+    context.fillText("线圈匝数（匝）", (left + right) / 2, height - 13);
+    if (summary.every((item) => item.mean === null)) {
+      context.fillText("记录一次测量后显示数据", (left + right) / 2, (top + bottom) / 2);
+    }
+
+    const averages = summary.filter((item) => item.mean !== null)
+      .map(({ turns, mean }) => `${turns} 匝平均 ${mean.toFixed(1)} 枚`);
+    plot.setAttribute("aria-label", averages.length ? averages.join("，") : "平均回形针数与线圈匝数的关系图，暂无记录");
+  }
+
+  function renderResults() {
+    const summary = LabModel.summary(state);
+    for (const item of summary) {
+      const cells = rows.get(item.turns);
+      item.counts.forEach((count, index) => {
+        cells[index].textContent = count ?? "—";
+        cells[index].classList.toggle("next-cell", item.turns === state.turns && index === state.round - 1);
+      });
+      cells[3].textContent = item.mean === null ? "—" : item.mean.toFixed(1);
+    }
+    byId("nextOrder").textContent = state.complete
+      ? "三轮测量完成。比较三个平均值，写出你的结论。"
+      : `第 ${state.round} 轮顺序：${rounds[state.round - 1].join(" → ")} 匝`;
+    byId("exportButton").disabled = !state.records.length;
+    drawPlot(summary);
+  }
+
+  function render() {
+    const powered = state.phase === "powered" || state.phase === "lifted";
+    const lifted = state.phase === "lifted" || state.phase === "off";
+    const pending = timer !== null;
+    const showReading = state.sample !== null && !pending;
+    scene.update({
+      turns: selected,
+      powered,
+      lifted,
+      count: powered ? state.sample?.count ?? 0 : 0,
+      trial: state.index,
+      field: fieldToggle.checked,
+    });
+    stage.setAttribute(
+      "aria-label",
+      `${selected} 匝线圈，${powered ? "已通电" : "已断电"}，${lifted ? "铁芯已提起" : "铁芯接触盘中回形针"}${showReading && powered ? `，悬挂 ${state.sample.count} 枚回形针` : ""}`,
+    );
+    byId("powerLabel").textContent = powered ? "通电" : "断电";
+    byId("powerState").classList.toggle("is-on", powered);
+    byId("currentTitle").textContent = state.phase === "off" ? "测量时电流" : "线圈电流";
+    byId("countTitle").textContent = state.phase === "off" ? "刚才提起的回形针" : "提起的回形针";
+    byId("currentReadout").firstChild.nodeValue = powered || showReading
+      ? `${LabModel.currentFor(selected).toFixed(3)} ` : "0.000 ";
+    byId("countReadout").firstChild.nodeValue = showReading ? `${state.sample.count} ` : "— ";
+    byId("progressLabel").textContent = `${state.index} / ${LabModel.ORDER.length}`;
+    meter.setAttribute("aria-valuenow", state.index);
+    segments.forEach((segment, index) => segment.classList.toggle("filled", index < state.index));
+    byId("roundTag").textContent = state.complete ? "9 次测量已记录"
+      : `第 ${state.round} 轮 · 第 ${state.index % 3 + 1} 次`;
+    byId("controlHeading").textContent = state.complete ? "实验完成" : "选择线圈";
+    byId("coilInstruction").textContent = state.complete ? "比较三个平均值，写出你发现的规律。" : `本次使用 ${state.turns} 匝线圈。`;
+    byId("coilPicker").hidden = state.complete;
+    byId("instructions").hidden = state.complete;
+    byId("reviewLink").hidden = !state.complete;
+
+    for (const button of coils) {
+      button.disabled = state.phase !== "ready";
+      button.setAttribute("aria-pressed", String(Number(button.dataset.turns) === selected));
+    }
+    if (!state.complete) {
+      const config = phases[state.phase];
+      for (const [index, step] of steps.entries()) {
+        step.classList.toggle("done", index < config.step);
+        if (index === config.step) step.setAttribute("aria-current", "step");
+        else step.removeAttribute("aria-current");
+      }
+      byId("actionHint").textContent = guidance();
+      byId("actionLabel").textContent = config.label;
+      actionButton.disabled = selected !== state.turns;
+      actionButton.setAttribute("aria-disabled", String(pending));
+    }
+    renderResults();
+  }
+
+  actionButton.addEventListener("click", () => {
+    if (state.complete || timer !== null || selected !== state.turns) return;
+    const action = phases[state.phase].action;
+    state = LabModel.act(state, action);
+    if (waitDurations[action]) {
+      timer = window.setTimeout(() => {
+        timer = null;
+        render();
+      }, waitDurations[action]);
+    }
+    if (action === "record") save();
+    render();
+    if (action === "record") {
+      const nextControl = state.complete ? byId("reviewLink")
+        : coils.find((button) => Number(button.dataset.turns) === state.turns);
+      nextControl.focus({ preventScroll: true });
+    }
+  });
+
+  for (const button of coils) {
+    button.addEventListener("click", () => {
+      selected = Number(button.dataset.turns);
+      render();
+    });
+  }
+  fieldToggle.addEventListener("change", () => {
+    save();
+    render();
+  });
+  conclusion.addEventListener("input", save);
+  byId("helpButton").addEventListener("click", () => byId("helpDialog").showModal());
+  byId("resetButton").addEventListener("click", () => byId("resetDialog").showModal());
+  byId("confirmReset").addEventListener("click", () => {
+    window.clearTimeout(timer);
+    timer = null;
+    state = LabModel.act(state, "reset");
+    selected = state.turns;
+    conclusion.value = "";
+    save();
+    byId("resetDialog").close();
+    render();
+    actionButton.focus({ preventScroll: true });
+    actionButton.scrollIntoView({ block: "nearest" });
+  });
+  byId("exportButton").addEventListener("click", () => {
+    const csvRows = [
+      "轮次,线圈匝数,提起的回形针数（枚）,电流（A）",
+      ...state.records.map(({ round, turns, count, current }) => [round, turns, count, current.toFixed(3)].join(",")),
+    ];
+    const url = URL.createObjectURL(new Blob(["\ufeff", csvRows.join("\r\n")], { type: "text/csv;charset=utf-8" }));
+    const download = document.createElement("a");
+    download.href = url;
+    download.download = "IGCSE电磁铁实验记录.csv";
+    document.body.appendChild(download);
+    download.click();
+    download.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
+
+  new ResizeObserver(() => drawPlot(LabModel.summary(state))).observe(plot);
+  render();
+})();
+
+const chapterLabs = new Map();
+
+function registerLab(lab) {
+  chapterLabs.set(lab.id, lab);
+}
+
+(() => {
+  const jade = "#16483b";
+  const muted = "#476457";
+  const north = "#b74743";
+  const south = "#3d7098";
+  const floor = "#f1f4ec";
+  const canvasFont = '"PingFang SC", "Microsoft YaHei", system-ui, sans-serif';
+  const left = { x: 155, y: 188, leftPole: -1, rightPole: 1 };
+  const configurations = {
+    single: { label: "单块磁铁", magnets: [left] },
+    like: { label: "同极相对 N–N", magnets: [left, { x: 449, y: 188, leftPole: 1, rightPole: -1 }] },
+    unlike: { label: "异极相对 N–S", magnets: [left, { x: 449, y: 188, leftPole: -1, rightPole: 1 }] },
+  };
+  const probes = {
+    middle: { label: "中央", x: 390, y: 214 },
+    above: { label: "中央上方", x: 390, y: 108 },
+    below: { label: "中央下方", x: 390, y: 307 },
+    left: { label: "左侧外部", x: 94, y: 214 },
+    right: { label: "右侧外部", x: 686, y: 214 },
+  };
+  const directions = ["向右", "向右上", "向上", "向左上", "向左", "向左下", "向下", "向右下"];
+
+  function localField(magnets, x, y) {
+    let bx = 0;
+    let by = 0;
+    for (const magnet of magnets) {
+      for (const [pole, charge] of [[magnet.x + 19, magnet.leftPole], [magnet.x + 157, magnet.rightPole]]) {
+        const dx = x - pole;
+        const dy = y - (magnet.y + 26);
+        const r = Math.max(Math.hypot(dx, dy), 7);
+        bx += charge * dx / r ** 3;
+        by += charge * dy / r ** 3;
+      }
+    }
+    return { bx, by, strength: Math.hypot(bx, by) };
+  }
+
+  function describe(field) {
+    if (field.strength < 1e-8) return "无确定方向";
+    const angle = (Math.atan2(-field.by, field.bx) * 180 / Math.PI + 360) % 360;
+    return directions[Math.round(angle / 45) % directions.length];
+  }
+
+  function label(ctx, text, x, y, size = 18, color = jade, weight = 600, align = "left") {
+    ctx.font = `${weight} ${size}px ${canvasFont}`;
+    ctx.textAlign = align;
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = color;
+    ctx.fillText(text, x, y);
+  }
+
+  function panel(ctx, x, y, width, height, radius, color, outline) {
+    ctx.beginPath();
+    ctx.roundRect(x, y, width, height, radius);
+    ctx.fillStyle = color;
+    ctx.fill();
+    if (outline) {
+      ctx.strokeStyle = outline;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+  }
+
+  function segment(ctx, x1, y1, x2, y2, color, width = 1) {
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.stroke();
+  }
+
+  function drawNeedle(ctx, x, y, radius, angle, color) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle);
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(0, -radius * .22);
+    ctx.lineTo(radius, 0);
+    ctx.lineTo(0, radius * .22);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawBackground(ctx, width, height) {
+    ctx.fillStyle = floor;
+    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = "#d3e0d4";
+    for (let x = 21; x < width; x += 21) {
+      for (let y = 21; y < height; y += 21) ctx.fillRect(x, y, 1.5, 1.5);
+    }
+    segment(ctx, 31, 59, width - 31, 59, "#d5e0d3");
+    label(ctx, "在磁铁外放置小磁针", 32, 34, 19);
+    drawNeedle(ctx, width - 183, 34, 15, 0, north);
+    label(ctx, "红色为磁针 N 端", width - 156, 34, 15, muted);
+  }
+
+  function drawArrow(ctx, x, y, angle, length, opacity) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle);
+    ctx.globalAlpha = opacity;
+    ctx.strokeStyle = "#488570";
+    ctx.lineWidth = 1.8;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    ctx.moveTo(-length / 2, 0);
+    ctx.lineTo(length / 2, 0);
+    ctx.moveTo(length / 2 - 5, -4);
+    ctx.lineTo(length / 2, 0);
+    ctx.lineTo(length / 2 - 5, 4);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawField(ctx, magnets, selected) {
+    for (let y = 82; y <= 345; y += 34) {
+      for (let x = 56; x <= 732; x += 39) {
+        if (magnets.some((magnet) => x > magnet.x - 14 && x < magnet.x + 190 && y > 170 && y < 257)) continue;
+        if (Math.hypot(x - selected.x, y - selected.y) < 38) continue;
+        const field = localField(magnets, x, y);
+        if (field.strength < 1e-8) continue;
+        const weight = Math.min(1, Math.sqrt(field.strength / 0.00035));
+        drawArrow(ctx, x, y, Math.atan2(field.by, field.bx), 10 + 10 * weight, .34 + .43 * weight);
+      }
+    }
+  }
+
+  function drawMagnet(ctx, magnet) {
+    const { x, y, leftPole, rightPole } = magnet;
+    ctx.save();
+    ctx.shadowColor = "#29483b27";
+    ctx.shadowBlur = 11;
+    ctx.shadowOffsetY = 4;
+    panel(ctx, x, y, 176, 52, 9, "#f5f9f1");
+    ctx.restore();
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(x, y, 176, 52, 9);
+    ctx.clip();
+    ctx.fillStyle = leftPole > 0 ? north : south;
+    ctx.fillRect(x, y, 88, 52);
+    ctx.fillStyle = rightPole > 0 ? north : south;
+    ctx.fillRect(x + 88, y, 88, 52);
+    const shade = ctx.createLinearGradient(x, y, x, y + 52);
+    shade.addColorStop(0, "#ffffff30");
+    shade.addColorStop(.46, "#ffffff00");
+    shade.addColorStop(1, "#192d342b");
+    ctx.fillStyle = shade;
+    ctx.fillRect(x, y, 176, 52);
+    segment(ctx, x + 88, y + 1, x + 88, y + 51, "#f6eceb72", 1.5);
+    ctx.restore();
+    label(ctx, leftPole > 0 ? "N" : "S", x + 44, y + 27, 26, "#ffffff", 750, "center");
+    label(ctx, rightPole > 0 ? "N" : "S", x + 132, y + 27, 26, "#ffffff", 750, "center");
+  }
+
+  function drawProbe(ctx, probe, selected, seen) {
+    ctx.beginPath();
+    ctx.arc(probe.x, probe.y, selected ? 29 : 6, 0, Math.PI * 2);
+    ctx.fillStyle = selected ? "#fffef7" : seen ? "#4f9274" : "#eef5ed";
+    ctx.fill();
+    ctx.strokeStyle = selected || seen ? "#32664e" : "#87a692";
+    ctx.lineWidth = selected ? 2.7 : 1.5;
+    ctx.stroke();
+
+    const captionY = probe.y + (selected ? 46 : 21);
+    label(ctx, probe.label, probe.x, captionY, selected ? 18 : 15, selected ? jade : muted, selected ? 750 : 550, "center");
+  }
+
+  function drawCompass(ctx, probe, field) {
+    const { x, y } = probe;
+    for (const degrees of [0, 90, 180, 270]) {
+      const angle = degrees * Math.PI / 180;
+      segment(ctx, x + Math.cos(angle) * 22, y + Math.sin(angle) * 22,
+        x + Math.cos(angle) * 26, y + Math.sin(angle) * 26, "#a3b7ab", 1.5);
+    }
+    if (field.strength < 1e-8) {
+      label(ctx, "？", x, y + 1, 25, muted, 700, "center");
+      return;
+    }
+    const angle = Math.atan2(field.by, field.bx);
+    drawNeedle(ctx, x, y, 23, angle, north);
+    drawNeedle(ctx, x, y, 23, angle + Math.PI, south);
+    ctx.beginPath();
+    ctx.arc(x, y, 3.4, 0, Math.PI * 2);
+    ctx.fillStyle = "#244e40";
+    ctx.fill();
+  }
+
+  registerLab({
+    id: "magnetic-field",
+    unit: "U6",
+    title: "用磁针探测磁场",
+    topic: "Magnets and Magnetic Fields",
+    page: "115",
+    question: "单块磁铁、同极相对和异极相对时，周围各处的磁场方向有什么不同？",
+    procedure: [
+      "先选单块磁铁，在至少三个位置记录磁针红色 N 端的方向。",
+      "选同极相对和异极相对，分别在中央、中央上方和中央下方记录方向。",
+      "打开磁场箭头，对照你的记录。比较两种摆法中央的方向，解释同极相对时的对称现象。",
+    ],
+    prompt: "同极相对和异极相对时，两磁铁正中央的磁场有何不同？各引用一条观察记录。",
+    controls: [
+      {
+        key: "configuration",
+        label: "磁铁摆法",
+        options: Object.entries(configurations).map(([value, item]) => [value, item.label]),
+        initial: "single",
+      },
+      {
+        key: "position",
+        label: "磁针位置",
+        options: Object.entries(probes).map(([value, item]) => [value, item.label]),
+        initial: "above",
+      },
+      {
+        key: "arrows",
+        label: "磁场箭头",
+        options: [["hidden", "隐藏"], ["shown", "显示"]],
+        initial: "hidden",
+      },
+    ],
+    columns: ["磁铁摆法", "磁针位置", "N 端方向"],
+    button: "记录磁针方向",
+    create: () => ({}),
+    measure({ values }) {
+      const setup = configurations[values.configuration];
+      const probe = probes[values.position];
+      const direction = describe(localField(setup.magnets, probe.x, probe.y));
+      const readout = direction === "无确定方向"
+        ? "中央两磁铁的磁场相互抵消，磁针没有确定方向。"
+        : `${probe.label}的磁针 N 端${direction}。`;
+      return { row: [setup.label, probe.label, direction], readout };
+    },
+    render({ ctx, width, height, values, rows }) {
+      const setup = configurations[values.configuration];
+      const selected = probes[values.position];
+      drawBackground(ctx, width, height);
+      if (values.arrows === "shown") drawField(ctx, setup.magnets, selected);
+      for (const magnet of setup.magnets) drawMagnet(ctx, magnet);
+      for (const probe of Object.values(probes)) {
+        const seen = rows.some((row) => row[0] === setup.label && row[1] === probe.label);
+        drawProbe(ctx, probe, probe === selected, seen);
+      }
+      drawCompass(ctx, selected, localField(setup.magnets, selected.x, selected.y));
+      segment(ctx, 31, height - 50, width - 31, height - 50, "#d5e0d3");
+      label(ctx, "磁针 N 端沿当地磁场方向", 32, height - 27, 17, muted);
+      label(ctx, "示意图仅显示条形磁铁的磁场", width - 32, height - 27, 15, muted, 550, "right");
+    },
+  });
+})();
+
+(() => {
+  const ink = "#193b31";
+  const muted = "#516b60";
+  const copper = "#a86539";
+  const speedChoices = [[2, "2 cm/s"], [4, "4 cm/s"], [8, "8 cm/s"]];
+  const motionNames = { approach: "推近", withdraw: "拉远", still: "保持静止" };
+  const poleNames = { north: "N 极", south: "S 极" };
+
+  function voltage({ motion, speed, pole }, progress) {
+    if (motion === "still" || progress <= 0 || progress >= 1) return 0;
+    const approached = motion === "approach" ? progress : 1 - progress;
+    const distance = 3 - 2.24 * approached;
+    const slope = 3 * distance / (1 + distance * distance) ** 2.5;
+    const sign = (motion === "approach" ? 1 : -1) * (pole === "north" ? 1 : -1);
+    return sign * 18 * speed * slope;
+  }
+
+  function waveform(values) {
+    return Array.from({ length: 51 }, (_, index) => [index * 2, voltage(values, index / 50)]);
+  }
+
+  function line(ctx, points, color, weight = 2) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = weight;
+    ctx.beginPath();
+    points.forEach(([x, y], index) => index ? ctx.lineTo(x, y) : ctx.moveTo(x, y));
+    ctx.stroke();
+  }
+
+  function round(ctx, x, y, w, h, radius, color, border) {
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, radius);
+    ctx.fillStyle = color;
+    ctx.fill();
+    if (border) {
+      ctx.strokeStyle = border;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+  }
+
+  function text(ctx, label, x, y, { size = 20, color = ink, weight = 620, align = "center" } = {}) {
+    ctx.fillStyle = color;
+    ctx.font = `${weight} ${size}px "PingFang SC", "Microsoft YaHei", sans-serif`;
+    ctx.textAlign = align;
+    ctx.textBaseline = "middle";
+    ctx.fillText(label, x, y);
+  }
+
+  function arrow(ctx, x1, x2, y) {
+    const side = Math.sign(x2 - x1);
+    line(ctx, [[x1, y], [x2, y]], muted);
+    line(ctx, [[x2 - side * 9, y - 6], [x2, y], [x2 - side * 9, y + 6]], muted);
+  }
+
+  function render({ ctx, width, height, values, model, time }) {
+    const hasTrial = model?.values && Object.keys(values).every((key) => values[key] === model.values[key]);
+    const t = hasTrial ? time : 0;
+    const { motion, pole } = values;
+    const amount = motion === "approach" ? t : motion === "withdraw" ? 1 - t : .55;
+    const magnetX = 111 + 148 * amount;
+    const millivolts = voltage(values, t);
+    const meterX = 603;
+    const meterY = 238;
+
+    ctx.fillStyle = "#f1f4ec";
+    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = "#d9e3d7";
+    for (let x = 14; x < width; x += 18) {
+      for (let y = 14; y < height; y += 18) ctx.fillRect(x, y, 1.2, 1.2);
+    }
+    ctx.setLineDash([5, 7]);
+    line(ctx, [[50, 209], [512, 209]], "#a9b8ad");
+    ctx.setLineDash([]);
+
+    round(ctx, magnetX, 182, 116, 54, 6, pole === "north" ? "#4a708c" : "#a34334", "#334b49");
+    ctx.fillStyle = pole === "north" ? "#a34334" : "#4a708c";
+    ctx.fillRect(magnetX + 59, 184, 54, 50);
+    text(ctx, pole === "north" ? "S" : "N", magnetX + 30, 210, { color: "#ffffff" });
+    text(ctx, pole === "north" ? "N" : "S", magnetX + 87, 210, { color: "#ffffff" });
+    text(ctx, "条形磁铁", magnetX + 58, 157);
+
+    if (motion === "still") {
+      text(ctx, "保持静止", magnetX + 58, 272, { size: 17, color: muted });
+    } else {
+      const start = motion === "approach" ? 129 : 344;
+      const end = motion === "approach" ? 344 : 129;
+      arrow(ctx, start, end, 272);
+      text(ctx, motionNames[motion], (start + end) / 2, 298, { size: 17, color: muted });
+    }
+
+    line(ctx, [[391, 167], [391, 122], [547, 122], [547, 154]], muted, 3);
+    line(ctx, [[458, 254], [458, 326], [656, 326], [656, 276]], muted, 3);
+    round(ctx, 376, 166, 98, 88, 12, "#f1e4d0", "#9f785c");
+    for (let x = 385; x <= 464; x += 8) {
+      ctx.strokeStyle = copper;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.ellipse(x, 210, 7, 43, 0, -.42 * Math.PI, 1.42 * Math.PI);
+      ctx.stroke();
+    }
+    text(ctx, "线圈", 425, 146);
+    text(ctx, "导线接法固定", 530, 349, { size: 16, color: muted });
+
+    round(ctx, 524, 147, 158, 136, 14, "#fafbf6", "#9ab0a1");
+    ctx.strokeStyle = "#8ca194";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(meterX, meterY, 49, -Math.PI * .91, -Math.PI * .09);
+    ctx.stroke();
+    for (let i = 0; i <= 8; i++) {
+      const angle = -Math.PI * .91 + i * .82 * Math.PI / 8;
+      const at = (radius) => [meterX + Math.cos(angle) * radius, meterY + Math.sin(angle) * radius];
+      line(ctx, [at(43), at(49)], muted);
+    }
+    const angle = -Math.PI / 2 + Math.max(-1, Math.min(1, millivolts / 125)) * Math.PI * .4;
+    line(ctx, [[meterX, meterY], [meterX + Math.cos(angle) * 42, meterY + Math.sin(angle) * 42]], "#b14d38", 3);
+    text(ctx, "−", 555, 223, { size: 17, color: muted });
+    text(ctx, "0", 603, 177, { size: 16, color: muted });
+    text(ctx, "+", 651, 223, { size: 17, color: muted });
+    text(ctx, `${millivolts.toFixed(0)} mV`, 603, 260, { size: 18 });
+    text(ctx, "电压表", meterX, 110, { size: 19 });
+  }
+
+  registerLab({
+    id: "electromagnetic-induction",
+    unit: "U6",
+    title: "磁铁运动与感应电压",
+    topic: "Electromagnetic Induction",
+    page: "121–122",
+    question: "磁铁靠近、远离或静止时，线圈两端的电压有什么不同？",
+    procedure: [
+      "让 N 极朝向线圈，先比较静止、推近和拉远。",
+      "保持方向和磁极相同，换两个速度再测。",
+      "对照电压正负和峰值，最后试着翻转磁铁。",
+    ],
+    prompt: "比较两次仅运动方向不同的测量。电压符号如何变化？速度改变时，峰值大小如何变化？",
+    controls: [
+      { key: "motion", label: "磁铁的运动", options: [["approach", "推近线圈"], ["withdraw", "拉远磁铁"], ["still", "保持静止"]], initial: "approach" },
+      { key: "speed", label: "运动速度（静止时为 0）", options: speedChoices, initial: 4 },
+      { key: "pole", label: "朝向线圈的磁极", options: [["north", "N 极"], ["south", "S 极"]], initial: "north" },
+    ],
+    columns: ["运动", "速度（cm/s）", "磁极", "带符号峰值（mV）"],
+    button: "运行并记录电压",
+    animationMs: ({ values }) => values.motion === "still" ? 650 : 2000 / Math.sqrt(values.speed / 2),
+    create: () => null,
+    measure({ values }) {
+      const points = waveform(values);
+      const peak = points.reduce((current, [, value]) => Math.abs(value) > Math.abs(current) ? value : current, 0);
+      const rounded = Math.round(peak) || 0;
+      return {
+        model: { values: { ...values }, points },
+        row: [motionNames[values.motion], values.motion === "still" ? 0 : values.speed, poleNames[values.pole], rounded],
+        readout: rounded === 0 ? "磁铁静止，感应电压为 0 mV。"
+          : `运动时峰值 ${rounded > 0 ? "+" : ""}${rounded} mV。磁铁停下后，电压回到 0。`,
+      };
+    },
+    render,
+    series: ({ model }) => ({
+      points: model?.points ?? [],
+      xLabel: "测量进度（%）",
+      yLabel: "最近一次测量的感应电压（mV）",
+      xMax: 100, yMin: -125, yMax: 125,
+    }),
+  });
+})();
+
+(() => {
+  const ink = "#16483b";
+  const muted = "#51655c";
+  const backdrop = "#f1f4ec";
+  const panel = "#fcfdf8";
+  const rule = "#cddbd0";
+  const jade = "#35775f";
+  const copper = "#a95334";
+  const font = '"Avenir Next", "PingFang SC", "Microsoft YaHei", sans-serif';
+
+  function text(ctx, content, x, y, { color = ink, size = 22, weight = 600, align = "left" } = {}) {
+    ctx.fillStyle = color;
+    ctx.font = `${weight} ${size}px ${font}`;
+    ctx.textAlign = align;
+    ctx.textBaseline = "middle";
+    ctx.fillText(content, x, y);
+  }
+
+  function surface(ctx, x, y, width, height, fill, stroke = rule, radius = 16) {
+    ctx.beginPath();
+    ctx.roundRect(x, y, width, height, radius);
+    ctx.fillStyle = fill;
+    ctx.fill();
+    if (stroke) {
+      ctx.strokeStyle = stroke;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+  }
+
+  function dot(ctx, x, y, radius, fill, stroke) {
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = fill;
+    ctx.fill();
+    if (stroke) {
+      ctx.strokeStyle = stroke;
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+    }
+  }
+
+  function background(ctx, width, height) {
+    ctx.fillStyle = backdrop;
+    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = "#a9b9aa38";
+    for (let y = 16; y < height; y += 20) {
+      for (let x = 16; x < width; x += 20) ctx.fillRect(x, y, 2, 2);
+    }
+  }
+
+  function generator(seed) {
+    let state = seed >>> 0;
+    return {
+      next() {
+        state = (state + 0x6D2B79F5) >>> 0;
+        let result = Math.imul(state ^ (state >>> 15), state | 1);
+        result ^= result + Math.imul(result ^ (result >>> 7), result | 61);
+        return ((result ^ (result >>> 14)) >>> 0) / 4294967296;
+      },
+      state: () => state,
+    };
+  }
+
+  function seed() {
+    return Math.floor(Math.random() * 4294967296);
+  }
+
+  const population = 192;
+  const simulationHalfLife = 12;
+  const endTime = 72;
+
+  function decayStart() {
+    const random = generator(seed());
+    return {
+      elapsed: 0,
+      from: 0,
+      lifetimes: Array.from({ length: population }, () =>
+        -simulationHalfLife * Math.log(1 - random.next()) / Math.LN2
+      ),
+    };
+  }
+
+  function remainingAt(lifetimes, elapsed) {
+    if (elapsed === 0) return population;
+    return lifetimes.filter((lifetime) => lifetime > elapsed).length;
+  }
+
+  function drawDecay({ ctx, width, height, model, time }) {
+    background(ctx, width, height);
+    const progress = Number.isFinite(time) ? time : 1;
+    const elapsed = model.from + (model.elapsed - model.from) * progress;
+    const remaining = remainingAt(model.lifetimes, elapsed);
+
+    surface(ctx, 43, 47, 442, 297, "#f9fcf5");
+    text(ctx, "样品中的原子核", 64, 76, { size: 23 });
+    for (const [index, lifetime] of model.lifetimes.entries()) {
+      const x = 67 + (index % 16) * 25;
+      const y = 108 + Math.floor(index / 16) * 19.5;
+      const unstable = elapsed === 0 || lifetime > elapsed;
+      const newlyDecayed = !unstable && progress < 0.94 && lifetime >= model.from;
+      if (unstable) {
+        dot(ctx, x, y, 6.25, jade);
+      } else {
+        dot(ctx, x, y, 6, newlyDecayed ? "#e5a57d" : "#e9eee5", newlyDecayed ? copper : "#b9c9bc");
+      }
+    }
+    dot(ctx, 56, 374, 7, jade);
+    text(ctx, "未衰变", 72, 374, { size: 21, color: muted });
+    dot(ctx, 185, 374, 7, "#e9eee5", "#b9c9bc");
+    text(ctx, "已衰变", 201, 374, { size: 21, color: muted });
+
+    surface(ctx, 513, 47, 225, 297, "#e4efe0", "#c7d9cb");
+    text(ctx, "模拟时间", 537, 80, { size: 21, color: muted });
+    text(ctx, `${elapsed.toFixed(progress === 1 ? 0 : 1)} s`, 537, 124, { size: 49, weight: 750 });
+    ctx.strokeStyle = "#baccbe";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(537, 164);
+    ctx.lineTo(713, 164);
+    ctx.stroke();
+    text(ctx, "未衰变核数", 537, 194, { size: 21, color: muted });
+    text(ctx, String(remaining), 537, 242, { size: 57, weight: 760 });
+    text(ctx, `初始 ${population} 个`, 537, 299, { size: 22, color: muted });
+  }
+
+  registerLab({
+    id: "half-life",
+    unit: "U7",
+    title: "放射性衰变与半衰期",
+    topic: "Half-Life",
+    page: "pp. 134–135",
+    question: "单个原子核何时衰变无法预知，样品中未衰变的核数会怎样变化？",
+    procedure: [
+      "样品起始有 192 个不稳定原子核。选定一个取样间隔。",
+      "多次点击「推进并记录」，观察未衰变核数和时间的关系。",
+      "在图上找出核数从 192 降到约 96 所需的时间。",
+    ],
+    prompt: "用图表估算半衰期。再选一段核数约减半的区间，比较它们所用的时间。",
+    controls: [
+      { key: "interval", label: "取样间隔", options: [[2, "2 s"], [4, "4 s"], [6, "6 s"], [12, "12 s"]], initial: 4 },
+    ],
+    columns: ["经过时间（s）", "未衰变核数（个）", "这段时间衰变数（个）"],
+    button: "推进并记录",
+    create: decayStart,
+    animationMs: 600,
+    measure({ values, model }) {
+      if (model.elapsed >= endTime) {
+        return { readout: `已记录到 ${endTime} s。用图表找出半衰期，或重置后再试一次。` };
+      }
+      const elapsed = Math.min(model.elapsed + values.interval, endTime);
+      const remaining = remainingAt(model.lifetimes, elapsed);
+      const decayed = remainingAt(model.lifetimes, model.elapsed) - remaining;
+      return {
+        model: { ...model, elapsed, from: model.elapsed },
+        row: [elapsed, remaining, decayed],
+        readout: `${elapsed} s 时，尚有 ${remaining} 个原子核未衰变。刚才的 ${elapsed - model.elapsed} s 内衰变了 ${decayed} 个。`,
+      };
+    },
+    render: drawDecay,
+    series({ rows, model }) {
+      return {
+        points: [[0, population], ...rows.map(([elapsed, remaining]) => [Number(elapsed), Number(remaining)])],
+        xLabel: "经过时间（s）",
+        yLabel: "未衰变核数（个）",
+        xMin: 0,
+        xMax: Math.max(24, Math.ceil(model.elapsed / 12) * 12),
+        yMin: 0,
+        yMax: 200,
+      };
+    },
+  });
+
+  const radiations = {
+    none: { name: "本底", color: muted, fractions: [0, 0, 0, 0] },
+    alpha: { name: "α 射线", color: copper, fractions: [1, 0, 0, 0] },
+    beta: { name: "β 射线", color: "#3c6181", fractions: [1, 0.88, 0, 0] },
+    gamma: { name: "γ 射线", color: "#5e4d82", fractions: [1, 0.99, 0.9, 0.28] },
+  };
+  const absorbers = [
+    { name: "无屏蔽", fill: null, width: 0 },
+    { name: "纸片", fill: "#eee4cd", width: 12 },
+    { name: "薄铝片", fill: "#afbdc5", width: 22 },
+    { name: "厚铅块", fill: "#647173", width: 53 },
+  ];
+  const backgroundCount = 6;
+
+  function poisson(random, expected) {
+    if (expected === 0) return 0;
+    let count = -1;
+    let product = 1;
+    const threshold = Math.exp(-expected);
+    do {
+      count += 1;
+      product *= random.next();
+    } while (product > threshold);
+    return count;
+  }
+
+  function drawRay(ctx, type, x, y, color) {
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = 3;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    if (type === "gamma") {
+      ctx.moveTo(x - 13, y);
+      ctx.bezierCurveTo(x - 10, y - 11, x - 4, y - 11, x - 1, y);
+      ctx.bezierCurveTo(x + 2, y + 11, x + 8, y + 11, x + 11, y);
+      ctx.stroke();
+    } else if (type === "beta") {
+      ctx.moveTo(x - 12, y);
+      ctx.lineTo(x - 3, y);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x + 5, y - 5);
+      ctx.lineTo(x + 10, y);
+      ctx.lineTo(x + 5, y + 5);
+      ctx.lineTo(x, y);
+      ctx.closePath();
+      ctx.fill();
+    } else {
+      ctx.moveTo(x - 14, y);
+      ctx.lineTo(x - 4, y);
+      ctx.stroke();
+      dot(ctx, x + 5, y, 6, color);
+    }
+  }
+
+  function drawShield({ ctx, width, height, values, model, time }) {
+    background(ctx, width, height);
+    const radiation = radiations[values.source];
+    const absorber = absorbers[values.absorber];
+    const fraction = radiation.fractions[values.absorber];
+    const matching = model.last?.source === values.source
+      && (values.source === "none" || model.last.absorber === values.absorber);
+    const progress = Number.isFinite(time) ? time : 1;
+    const count = matching ? model.last.total : null;
+    const measuring = matching && progress < 1;
+
+    surface(ctx, 36, 302, 706, 27, "#c8d9ce", "#aabfb2", 7);
+    surface(ctx, 65, 166, 123, 126, "#b9ccc0", "#6d887a", 19);
+    surface(ctx, 97, 183, 97, 92, "#32564b", "#234b3e", 10);
+    surface(ctx, 180, 207, 27, 42, "#426c5d", "#234b3e", 5);
+    text(ctx, values.source === "none" ? "无源" : radiation.name, 137, 228, {
+      align: "center", color: panel, size: 23, weight: 750,
+    });
+    text(ctx, "放射源", 131, 357, { align: "center", size: 23 });
+
+    surface(ctx, 356, 289, 68, 13, "#dce7df", "#aabfb2", 4);
+    if (absorber.width > 0) {
+      surface(ctx, 390 - absorber.width / 2, 137, absorber.width, 162, absorber.fill, "#687c72", 4);
+      ctx.save();
+      ctx.globalAlpha = 0.55;
+      surface(ctx, 389 - absorber.width / 2, 142, 3, 151, "#f7f9ee", null, 2);
+      ctx.restore();
+    }
+    text(ctx, absorber.name, 390, 357, { align: "center", size: 23 });
+
+    surface(ctx, 573, 185, 39, 82, "#719385", "#496d5e", 6);
+    surface(ctx, 598, 146, 128, 148, "#3e6758", "#294d41", 16);
+    surface(ctx, 611, 165, 101, 70, "#e3efdf", "#33564a", 8);
+    text(ctx, measuring ? "测量中" : count === null ? "—" : String(count), 661, 201, {
+      align: "center", size: measuring ? 22 : 35, weight: 760,
+    });
+    text(ctx, "次 / 10 s", 661, 255, { align: "center", color: "#f4f7ed", size: 18 });
+    text(ctx, "盖革计数器", 657, 357, { align: "center", size: 23 });
+
+    if (values.source !== "none") {
+      const active = measuring ? Math.min(1, progress * 2.25) : 1;
+      ctx.save();
+      ctx.globalAlpha = 0.83;
+      for (const [index, y] of [195, 211, 228, 246, 261].entries()) {
+        const x = 221 + Math.round(active * 111) + (index % 3) * 10;
+        drawRay(ctx, values.source, x, y, radiation.color);
+      }
+      const symbols = Math.round(fraction * 5);
+      if (active > 0.6) {
+        for (let index = 0; index < symbols; index++) {
+          const x = 430 + Math.round((active - 0.6) * 200) + (index % 3) * 9;
+          const y = 198 + index * 15;
+          drawRay(ctx, values.source, x, y, radiation.color);
+        }
+      }
+      ctx.restore();
+    }
+    const reference = model.background === null ? "先测本底" : `本底：${model.background} 次 / 10 s`;
+    surface(ctx, 44, 43, 220, 48, panel, rule, 10);
+    text(ctx, reference, 59, 68, { size: 22, color: muted });
+  }
+
+  registerLab({
+    id: "radiation-shielding",
+    unit: "U7",
+    title: "α、β、γ 辐射的穿透性",
+    topic: "Alpha, Beta and Gamma Radiation",
+    page: "pp. 129–131",
+    question: "哪种材料能挡住 α 或 β 射线？厚铅块会怎样影响 γ 的计数？",
+    procedure: [
+      "保持无放射源，测一次 10 s 的本底计数。",
+      "选择一种射线，先测无屏蔽时的计数，再更换屏蔽材料。",
+      "保持源与探测器的距离和计数时间不变，用净计数比较穿透能力。",
+    ],
+    prompt: "找出净计数降为零的组合。比较无屏蔽和厚铅块下 γ 射线的净计数，说明厚铅块的作用。",
+    controls: [
+      {
+        key: "source", label: "放射源",
+        options: [["none", "无源（测本底）"], ["alpha", "α 射线"], ["beta", "β 射线"], ["gamma", "γ 射线"]],
+        initial: "none",
+      },
+      { key: "absorber", label: "屏蔽材料", options: absorbers.map(({ name }, index) => [index, name]), initial: 0 },
+    ],
+    columns: ["射线", "屏蔽材料", "总计数", "本底", "净计数"],
+    button: "测量 10 s 计数",
+    create: () => ({ seed: seed(), background: null, last: null }),
+    animationMs: 1100,
+    measure({ values, model }) {
+      const { source, absorber } = values;
+      if (source === "none") {
+        return {
+          model: { ...model, background: backgroundCount, last: { source, absorber, total: backgroundCount } },
+          row: ["无源（本底）", "—", backgroundCount, backgroundCount, "—"],
+          readout: `10 s 内记录 ${backgroundCount} 次本底计数。现在可以选射线和屏蔽材料。`,
+        };
+      }
+      if (model.background === null) return { readout: "请先选择「无源（测本底）」并记录本底计数。" };
+
+      const radiation = radiations[source];
+      const random = generator(model.seed);
+      const net = poisson(random, 100 * radiation.fractions[absorber]);
+      const total = net + model.background;
+      return {
+        model: { ...model, seed: random.state(), last: { source, absorber, total } },
+        row: [radiation.name, absorbers[absorber].name, total, model.background, net],
+        readout: `10 s 总计数 ${total}，扣除本底 ${model.background}，净计数为 ${net}。数值来自简化模型。`,
+      };
+    },
+    render: drawShield,
+  });
+})();
+
+(() => {
+  const TAU = 2 * Math.PI;
+  const LIGHT_SPEED = 299792.458; // km/s
+  const EXPANSION_RATE = 70; // km/s/Mpc, an illustrative model parameter
+  const EARTH_SPEED = 29.785; // km/s
+  const HYDROGEN_LINES = [410.2, 434.0, 486.1, 656.3];
+  const H_ALPHA = HYDROGEN_LINES.at(-1);
+  const ORBIT_RADII = [0.5, 0.75, 1, 1.5, 2];
+  const GALAXY_DISTANCES = [50, 100, 150, 200, 250];
+  const palette = {
+    paper: "#f1f4ec",
+    space: "#102d2b",
+    line: "#52716a",
+    text: "#ebf3ed",
+    muted: "#b4ccc3",
+    gold: "#f7bb73",
+    jade: "#a0d8c1",
+  };
+  const font = '"Avenir Next", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif';
+
+  function label(ctx, text, x, y, { size = 18, weight = 500, color = palette.text, align = "left" } = {}) {
+    ctx.fillStyle = color;
+    ctx.font = `${weight} ${size}px ${font}`;
+    ctx.textAlign = align;
+    ctx.textBaseline = "middle";
+    ctx.fillText(text, x, y);
+  }
+
+  function strokeLine(ctx, x1, y1, x2, y2, color, width = 1) {
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.stroke();
+  }
+
+  function disc(ctx, x, y, radius, fill) {
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, TAU);
+    ctx.fillStyle = fill;
+    ctx.fill();
+  }
+
+  function arrow(ctx, x1, y1, x2, y2, color, head = 8, width = 2) {
+    const angle = Math.atan2(y2 - y1, x2 - x1);
+    strokeLine(ctx, x1, y1, x2, y2, color, width);
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(x2, y2);
+    ctx.lineTo(x2 - head * Math.cos(angle - 0.52), y2 - head * Math.sin(angle - 0.52));
+    ctx.lineTo(x2 - head * Math.cos(angle + 0.52), y2 - head * Math.sin(angle + 0.52));
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function frame(ctx, width, height) {
+    ctx.fillStyle = palette.paper;
+    ctx.fillRect(0, 0, width, height);
+    ctx.beginPath();
+    ctx.roundRect(20, 19, width - 40, height - 64, 22);
+    ctx.fillStyle = palette.space;
+    ctx.fill();
+  }
+
+  function orbitalPeriod(radius) {
+    return radius ** 1.5;
+  }
+
+  function orbitalSpeed(radius) {
+    return EARTH_SPEED / Math.sqrt(radius);
+  }
+
+  function drawOrbit({ ctx, width, height, values, model, time }) {
+    const radius = values.radius;
+    const period = orbitalPeriod(radius);
+    const measuring = model?.radius === radius;
+    // One display clock is used for every radius. The planet stops after a full orbit.
+    const elapsed = measuring ? Math.min(period, time * orbitalPeriod(2)) : 0;
+    const fraction = elapsed / period;
+    const cx = 236;
+    const cy = 196;
+    const ring = radius * 74;
+    const initialAngle = -Math.PI / 3;
+    const angle = initialAngle + fraction * TAU;
+    const radialX = Math.cos(angle);
+    const radialY = Math.sin(angle);
+    const planetX = cx + ring * radialX;
+    const planetY = cy + ring * radialY;
+    const tangentX = -radialY;
+    const tangentY = radialX;
+    const velocityLength = 31 / Math.sqrt(radius);
+
+    frame(ctx, width, height);
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(20, 19, width - 40, height - 64, 22);
+    ctx.clip();
+    for (let i = 0; i < 43; i++) {
+      const x = 33 + ((i * 179 + 46) % 420);
+      const y = 28 + ((i * 61 + 49) % 332);
+      disc(ctx, x, y, i % 7 === 0 ? 1.45 : 0.8, i % 7 === 0 ? "#86a9a1" : "#52716a");
+    }
+
+    strokeLine(ctx, 449, 44, 449, 348, "#52716a");
+    ctx.beginPath();
+    ctx.arc(cx, cy, ring, 0, TAU);
+    ctx.strokeStyle = "#74978a";
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    if (fraction > 0) {
+      ctx.beginPath();
+      ctx.arc(cx, cy, ring, initialAngle, angle);
+      ctx.strokeStyle = palette.gold;
+      ctx.lineWidth = 3;
+      ctx.stroke();
+    }
+
+    ctx.save();
+    ctx.setLineDash([5, 5]);
+    strokeLine(ctx, cx, cy, planetX, planetY, "#9db9ac", 1.2);
+    ctx.restore();
+
+    const glow = ctx.createRadialGradient(cx - 4, cy - 5, 3, cx, cy, 32);
+    glow.addColorStop(0, "#fff5b4");
+    glow.addColorStop(0.43, "#f7bb73");
+    glow.addColorStop(0.56, "#f1a65f");
+    glow.addColorStop(0.6, "#d07d4250");
+    glow.addColorStop(1, "#d07d4200");
+    disc(ctx, cx, cy, 32, glow);
+    label(ctx, "太阳", cx, cy + 30, { size: 17, weight: 650, align: "center" });
+
+    disc(ctx, planetX, planetY, 8.5, "#b6e4d2");
+    disc(ctx, planetX - 2.1, planetY - 2.5, 3.2, "#ecf8f2");
+    const radialLength = Math.min(31, ring - 22);
+    arrow(ctx, planetX - radialX * 9, planetY - radialY * 9,
+      planetX - radialX * radialLength, planetY - radialY * radialLength, palette.jade, 6, 2);
+    arrow(ctx, planetX + tangentX * 10, planetY + tangentY * 10,
+      planetX + tangentX * (velocityLength + 10), planetY + tangentY * (velocityLength + 10), palette.gold, 8, 2.4);
+
+    label(ctx, "轨道半径", 479, 63, { color: palette.muted });
+    label(ctx, `${radius.toFixed(2)} AU`, 479, 103, { size: 34, weight: 750 });
+    label(ctx, "模拟计时", 479, 166, { color: palette.muted });
+    label(ctx, `${elapsed.toFixed(2)} 地球年`, 479, 205, { size: 32, weight: 750 });
+    label(ctx, measuring && fraction >= 1 ? "完成一圈" : "从起点绕行一圈", 480, 242, {
+      size: 16, color: measuring && fraction >= 1 ? palette.gold : palette.muted,
+    });
+    arrow(ctx, 479, 294, 510, 294, palette.gold);
+    label(ctx, "瞬时速度", 521, 294, { size: 17 });
+    arrow(ctx, 479, 327, 510, 327, palette.jade);
+    label(ctx, "引力方向", 521, 327, { size: 17 });
+    ctx.restore();
+    label(ctx, "圆轨道模型 · 太阳质量固定 · 太阳和行星大小为示意", width / 2, height - 22,
+      { color: "#405b51", size: 17, align: "center" });
+  }
+
+  registerLab({
+    id: "orbital-motion",
+    unit: "U8",
+    title: "轨道半径与公转周期",
+    topic: "Gravity and Orbits",
+    page: "145–146",
+    question: "绕同一颗恒星运行时，圆轨道的半径如何影响公转周期和速度？",
+    procedure: [
+      "选择圆轨道半径。太阳质量保持相同。",
+      "点击「观测一圈」，看行星走完一圈的模拟计时。",
+      "记录至少三种半径，再比较周期与速度。",
+    ],
+    prompt: "半径增加时，公转周期和速度分别怎样变化？任选一组数据，用 v = 2πr/T 核对速度。1 AU 约为 1.496 × 10⁸ km，1 年约为 3.156 × 10⁷ s。",
+    controls: [{
+      key: "radius",
+      label: "轨道半径",
+      options: ORBIT_RADII.map((radius) => [radius, `${radius.toFixed(2)} AU`]),
+      initial: 1,
+    }],
+    columns: ["半径（AU）", "周期（年）", "速度（km/s）"],
+    button: "观测一圈",
+    create: () => ({ radius: null }),
+    animationMs: 4100,
+    measure({ values }) {
+      const radius = values.radius;
+      const period = orbitalPeriod(radius).toFixed(2);
+      const speed = orbitalSpeed(radius).toFixed(1);
+      return {
+        model: { radius },
+        row: [radius.toFixed(2), period, speed],
+        readout: `${radius.toFixed(2)} AU：公转周期 ${period} 年，轨道速度 ${speed} km/s。`,
+      };
+    },
+    render: drawOrbit,
+    series({ rows }) {
+      return {
+        points: rows.map(([radius, period]) => [Number(radius), Number(period)]),
+        xLabel: "轨道半径（AU）",
+        yLabel: "公转周期（年）",
+        xMax: 2.2,
+        yMax: 3,
+      };
+    },
+  });
+
+  function redshift(distance) {
+    return EXPANSION_RATE * distance / LIGHT_SPEED;
+  }
+
+  function drawSpectra({ ctx, width, height, values, model, time }) {
+    const distance = values.distance;
+    const completed = model?.distance === distance;
+    const shift = redshift(distance) * (completed ? time : 1);
+    const left = 54;
+    const right = width - 54;
+    const span = right - left;
+    const wavelengthX = (nm) => left + (nm - 400) / 320 * span;
+    const colors = [
+      [0, "#5238a0"], [0.12, "#4155c5"], [0.23, "#2d96df"], [0.33, "#53cdd4"],
+      [0.42, "#52b981"], [0.52, "#aacc63"], [0.58, "#e8cf6d"], [0.66, "#ec9a59"],
+      [0.77, "#d96350"], [0.92, "#ae3f46"], [1, "#9c3942"],
+    ];
+    const baselineY = 100;
+    const observedY = 232;
+    const stripHeight = 46;
+
+    frame(ctx, width, height);
+    label(ctx, "实验室参考光谱", left, 74, { size: 22, weight: 700 });
+    label(ctx, "同一种元素的暗线", right, 74, { size: 17, color: palette.muted, align: "right" });
+    label(ctx, "星系观测光谱", left, 206, { size: 22, weight: 700 });
+    label(ctx, `${distance} Mpc`, right, 206, { size: 19, weight: 700, color: palette.muted, align: "right" });
+
+    const gradient = ctx.createLinearGradient(left, 0, right, 0);
+    for (const [offset, color] of colors) gradient.addColorStop(offset, color);
+    for (const [y, z] of [[baselineY, 0], [observedY, shift]]) {
+      ctx.beginPath();
+      ctx.roundRect(left, y, span, stripHeight, 7);
+      ctx.fillStyle = gradient;
+      ctx.fill();
+      ctx.save();
+      ctx.clip();
+      for (const wavelength of HYDROGEN_LINES) {
+        const x = wavelengthX(wavelength * (1 + z));
+        ctx.fillStyle = wavelength === H_ALPHA ? "#121b1b" : "#192227";
+        ctx.fillRect(x - 3, y, 6, stripHeight);
+      }
+      ctx.restore();
+    }
+
+    const referenceX = wavelengthX(H_ALPHA);
+    const observedX = wavelengthX(H_ALPHA * (1 + shift));
+    ctx.save();
+    ctx.setLineDash([4, 4]);
+    strokeLine(ctx, referenceX, baselineY + stripHeight, referenceX, observedY, palette.muted, 1.5);
+    ctx.restore();
+    strokeLine(ctx, observedX, observedY - 48, observedX, observedY, palette.gold, 1.4);
+    if (observedX > referenceX + 2) {
+      arrow(ctx, referenceX, observedY - 48, observedX, observedY - 48, palette.gold, 6, 1.8);
+    }
+    label(ctx, "Hα", referenceX, baselineY + stripHeight + 16, {
+      align: "right", size: 17, weight: 700, color: palette.muted,
+    });
+
+    const axisY = 301;
+    strokeLine(ctx, left, axisY, right, axisY, palette.line);
+    for (const wavelength of [400, 450, 500, 550, 600, 650, 700]) {
+      const x = wavelengthX(wavelength);
+      strokeLine(ctx, x, axisY, x, axisY + 7, palette.muted);
+      label(ctx, String(wavelength), x, axisY + 19, { size: 16, align: "center", color: palette.muted });
+    }
+    label(ctx, "波长（nm）", right, 349, { size: 16, align: "right", color: palette.muted });
+    label(ctx, "用同一波长标尺对齐两条光谱 · 模拟数据", width / 2, height - 22,
+      { color: "#405b51", size: 17, align: "center" });
+  }
+
+  registerLab({
+    id: "galaxy-redshift",
+    unit: "U8",
+    title: "星系光谱与红移",
+    topic: "Classifying Stars and Red-Shift / More on Red-Shift",
+    page: "150–151",
+    question: "在这个膨胀模型中，星系距离增大时，同一条吸收线会怎样移动？",
+    procedure: [
+      "选择星系距离，比较两条光谱的 Hα 暗线。",
+      "读取观测波长，计算它比参考波长增加了多少。",
+      "选择至少三种距离，比较红移量。",
+    ],
+    prompt: "用两组读数比较距离与红移量。为什么暗线向较长波长移动表明星系正在远离？可用 z = Δλ/λ₀ 比较相对波长变化。",
+    controls: [{
+      key: "distance",
+      label: "星系距离",
+      options: GALAXY_DISTANCES.map((distance) => [distance, `${distance} Mpc`]),
+      initial: 100,
+    }],
+    columns: ["距离（Mpc）", "参考 λ₀（nm）", "观测 λ（nm）", "偏移 Δλ（nm）"],
+    button: "读取 Hα 波长",
+    create: () => ({ distance: null }),
+    animationMs: 650,
+    measure({ values }) {
+      const distance = values.distance;
+      const z = redshift(distance);
+      const observed = (H_ALPHA * (1 + z)).toFixed(1);
+      const difference = (H_ALPHA * z).toFixed(1);
+      return {
+        model: { distance },
+        row: [distance, H_ALPHA.toFixed(1), observed, difference],
+        readout: `Hα：${H_ALPHA.toFixed(1)} → ${observed} nm，红移量 ${difference} nm。`,
+      };
+    },
+    render: drawSpectra,
+    series({ rows }) {
+      return {
+        points: rows.map(([distance, , , difference]) => [Number(distance), Number(difference)]),
+        xLabel: "星系距离（Mpc）",
+        yLabel: "红移量（nm）",
+        xMax: 270,
+        yMax: 45,
+      };
+    },
+  });
+})();
+
+(() => {
+  const byId = (id) => document.getElementById(id);
+  const library = byId("libraryView");
+  const original = byId("originalLab");
+  const extra = byId("extraLabView");
+  const scene = byId("extraScene");
+  const chart = byId("extraChart");
+  const parameters = byId("extraParameters");
+  const conclusion = byId("extraConclusion");
+  const measureButton = byId("extraMeasure");
+  const table = byId("extraTable");
+  const motion = matchMedia("(prefers-reduced-motion: reduce)");
+  const units = [
+    { key: "U6", title: "磁学与电磁学", subtitle: "Magnetism and Electromagnetism" },
+    { key: "U7", title: "放射性与粒子", subtitle: "Radioactivity and Particles" },
+    { key: "U8", title: "天体物理", subtitle: "Astrophysics" },
+  ];
+  const electromagnet = {
+    id: "electromagnet", unit: "U6", title: "电磁铁的吸力",
+    question: "改变线圈匝数，提起的回形针数会怎么变？",
+    topic: "Electromagnetism", page: "116",
+  };
+  const labOrder = [
+    "magnetic-field", "electromagnet", "electromagnetic-induction",
+    "radiation-shielding", "half-life", "orbital-motion", "galaxy-redshift",
+  ];
+  let lab;
+  let session;
+  let request = 0;
+  let progress = 1;
+  let lastView;
+  const selectors = new Map();
+
+  function element(tag, className, text) {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  function chapterLabel(item) {
+    const page = String(item.page).replace(/^pp?\.?\s*/i, "");
+    return `${item.topic} · p. ${page}`;
+  }
+
+  function initialValues(definition) {
+    return Object.fromEntries((definition.controls ?? []).map(({ key, initial }) => [key, initial]));
+  }
+
+  function initialSession(definition) {
+    return {
+      values: initialValues(definition),
+      rows: [],
+      model: definition.create?.() ?? null,
+      readout: "",
+      conclusion: "",
+    };
+  }
+
+  function drawCanvas(canvas, definition, values, model, rows, time, logicalSize = false) {
+    const context = canvas.getContext("2d");
+    if (!context) return;
+    const width = 780;
+    const height = 420;
+    const renderWidth = logicalSize ? width : Math.round(canvas.clientWidth * Math.min(devicePixelRatio || 1, 2));
+    const renderHeight = logicalSize ? height : Math.round(canvas.clientHeight * Math.min(devicePixelRatio || 1, 2));
+    if (!renderWidth || !renderHeight) return;
+    if (canvas.width !== renderWidth) canvas.width = renderWidth;
+    if (canvas.height !== renderHeight) canvas.height = renderHeight;
+    context.save();
+    try {
+      context.setTransform(renderWidth / width, 0, 0, renderHeight / height, 0, 0);
+      context.clearRect(0, 0, width, height);
+      definition.render({ ctx: context, width, height, values, model, rows, time });
+    } finally {
+      context.restore();
+    }
+  }
+
+  function buildLibrary() {
+    const root = byId("labLibrary");
+    const entries = labOrder.map((id) => id === electromagnet.id ? electromagnet : chapterLabs.get(id)).filter(Boolean);
+    for (const unit of units) {
+      const section = element("section", "library-unit");
+      section.id = `unit-${unit.key}`;
+      section.setAttribute("aria-labelledby", `title-${unit.key}`);
+      const heading = element("div", "unit-heading");
+      const title = element("h2", "", "");
+      title.id = `title-${unit.key}`;
+      title.append(element("span", "unit-code", unit.key), document.createTextNode(unit.title));
+      heading.append(title, element("p", "", unit.subtitle));
+      const grid = element("div", "lab-grid");
+      for (const item of entries.filter((entry) => entry.unit === unit.key)) {
+        const card = element("a", "lab-card panel");
+        card.href = `#${item.id}`;
+        const art = element("canvas", "card-art");
+        art.setAttribute("aria-hidden", "true");
+        const content = element("div", "card-copy");
+        const meta = element("p", "card-topic");
+        const arrow = element("span", "", "→");
+        arrow.setAttribute("aria-hidden", "true");
+        meta.append(element("span", "", chapterLabel(item)), arrow);
+        content.append(element("h3", "card-title", item.title), element("p", "card-question", item.question), meta);
+        card.append(art, content);
+        grid.append(card);
+        if (item === electromagnet) {
+          createLabScene(art).update({ turns: 120, powered: false, lifted: false, count: 0, field: false });
+        } else {
+          const setup = initialSession(item);
+          drawCanvas(art, item, setup.values, setup.model, [], 1, true);
+        }
+      }
+      section.append(heading, grid);
+      root.append(section);
+    }
+  }
+
+  function storageKey() {
+    return `igcse-physics-lab-v1-${lab.id}`;
+  }
+
+  function readSession() {
+    const setup = initialSession(lab);
+    try {
+      const saved = JSON.parse(localStorage.getItem(storageKey()));
+      if (!saved || !Array.isArray(saved.rows)) return setup;
+      for (const { key, options } of lab.controls ?? []) {
+        if (options.some(([value]) => value === saved.values?.[key])) setup.values[key] = saved.values[key];
+      }
+      setup.rows = saved.rows.filter((row) => Array.isArray(row) && row.length === lab.columns.length &&
+        row.every((value) => ["number", "string"].includes(typeof value)));
+      setup.model = saved.model ?? setup.model;
+      setup.readout = typeof saved.readout === "string" ? saved.readout : "";
+      setup.conclusion = typeof saved.conclusion === "string" ? saved.conclusion.slice(0, 1200) : "";
+    } catch {
+      return setup;
+    }
+    return setup;
+  }
+
+  function saveSession() {
+    try {
+      localStorage.setItem(storageKey(), JSON.stringify(session));
+    } catch {
+      // The current session and CSV export are still usable.
+    }
+  }
+
+  function setControlsDisabled(disabled) {
+    measureButton.setAttribute("aria-disabled", String(disabled));
+    for (const select of selectors.values()) select.disabled = disabled;
+  }
+
+  function cancelAnimation() {
+    cancelAnimationFrame(request);
+    request = 0;
+    progress = 1;
+  }
+
+  function drawScene() {
+    if (!lab || extra.hidden) return;
+    drawCanvas(scene, lab, session.values, session.model, session.rows, progress);
+  }
+
+  function drawChart() {
+    if (!lab?.series || extra.hidden) return;
+    const data = lab.series({ rows: session.rows, model: session.model, values: session.values });
+    const width = chart.clientWidth;
+    const height = chart.clientHeight;
+    if (!width || !height) return;
+    const scale = Math.min(devicePixelRatio || 1, 2);
+    const context = chart.getContext("2d");
+    chart.width = Math.round(width * scale);
+    chart.height = Math.round(height * scale);
+    context.setTransform(chart.width / width, 0, 0, chart.height / height, 0, 0);
+    const left = 40, right = width - 16, top = 18, bottom = height - 48;
+    const points = data.points.filter(([x, y]) => Number.isFinite(x) && Number.isFinite(y));
+    const xMin = data.xMin ?? 0, yMin = data.yMin ?? 0;
+    const xMax = Math.max(data.xMax, xMin + 1), yMax = Math.max(data.yMax, yMin + 1);
+    const xPos = (value) => left + (right - left) * (value - xMin) / (xMax - xMin);
+    const yPos = (value) => bottom - (bottom - top) * (value - yMin) / (yMax - yMin);
+    const format = (value) => String(Number(value.toFixed(3)));
+    context.font = '12px "PingFang SC", "Microsoft YaHei", sans-serif';
+    context.textBaseline = "middle";
+
+    function line(x1, y1, x2, y2, color, thickness = 1) {
+      context.strokeStyle = color;
+      context.lineWidth = thickness;
+      context.beginPath();
+      context.moveTo(x1, y1);
+      context.lineTo(x2, y2);
+      context.stroke();
+    }
+
+    for (let tick = 0; tick <= 4; tick++) {
+      const yValue = yMin + (yMax - yMin) * tick / 4;
+      const xValue = xMin + (xMax - xMin) * tick / 4;
+      const y = yPos(yValue), x = xPos(xValue);
+      line(left, y, right, y, "#dce6d9");
+      line(x, top, x, bottom, "#e7eee4");
+      context.fillStyle = "#51655c";
+      context.textAlign = "right";
+      context.fillText(format(yValue), left - 7, y);
+      context.textAlign = "center";
+      context.fillText(format(xValue), x, bottom + 13);
+    }
+    line(left, top, left, bottom, "#839d8d");
+    line(left, bottom, right, bottom, "#839d8d");
+    if (yMin < 0 && yMax > 0) line(left, yPos(0), right, yPos(0), "#839d8d");
+    context.textAlign = "center";
+    context.fillText(data.xLabel, (left + right) / 2, height - 13);
+    if (!points.length) context.fillText("记录测量后显示数据", (left + right) / 2, (top + bottom) / 2);
+
+    context.save();
+    context.beginPath();
+    context.rect(left - 4, top - 4, right - left + 8, bottom - top + 8);
+    context.clip();
+    const ordered = [...points].sort(([a], [b]) => a - b);
+    ordered.forEach(([x, y], index) => {
+      if (!index) return;
+      const [previousX, previousY] = ordered[index - 1];
+      line(xPos(previousX), yPos(previousY), xPos(x), yPos(y), "#518c73", 1.6);
+    });
+    for (const [x, y] of points) {
+      context.beginPath();
+      context.arc(xPos(x), yPos(y), points.length > 30 ? 2 : 4, 0, 2 * Math.PI);
+      context.fillStyle = "#176046";
+      context.fill();
+    }
+    context.restore();
+    byId("extraChartHeading").textContent = data.yLabel;
+    chart.setAttribute("aria-label", `${data.yLabel}随${data.xLabel}变化的图表，${points.length ? `${points.length} 个数据点` : "暂无数据"}`);
+  }
+
+  function renderData() {
+    const body = table.tBodies[0];
+    body.replaceChildren();
+    for (const row of session.rows) {
+      const tr = body.insertRow();
+      for (const value of row) tr.insertCell().textContent = String(value);
+    }
+    if (!session.rows.length) {
+      const empty = body.insertRow().insertCell();
+      empty.colSpan = lab.columns.length;
+      empty.className = "empty-row";
+      empty.textContent = "完成一次测量后，读数会填入这里。";
+    }
+    byId("extraReadout").textContent = session.readout || "等待测量";
+    byId("extraRecordCount").textContent = `已记录 ${session.rows.length} 次测量`;
+    byId("extraExport").disabled = !session.rows.length;
+    scene.setAttribute("aria-label", `${lab.title}仿真图${session.readout ? `。最近读数：${session.readout}` : ""}`);
+    drawChart();
+  }
+
+  function openLab(definition) {
+    cancelAnimation();
+    lab = definition;
+    session = readSession();
+    byId("extraTopic").textContent = `${lab.unit} · ${chapterLabel(lab)}`;
+    byId("extraTitle").textContent = lab.title;
+    byId("extraQuestion").textContent = lab.question;
+    byId("extraActionLabel").textContent = lab.button;
+    byId("extraPrompt").textContent = lab.prompt;
+    byId("extraProcedure").replaceChildren(...lab.procedure.map((step) => element("li", "", step)));
+    conclusion.value = session.conclusion;
+    const headers = lab.columns.map((column) => {
+      const th = element("th", "", column);
+      th.scope = "col";
+      return th;
+    });
+    table.tHead.rows[0].replaceChildren(...headers);
+    byId("extraResultsGrid").classList.toggle("table-only", !lab.series);
+    byId("extraChartCard").hidden = !lab.series;
+    selectors.clear();
+    parameters.replaceChildren();
+    for (const { key, label, options } of lab.controls ?? []) {
+      const control = element("label", "lab-control");
+      const select = element("select");
+      options.forEach(([value, caption], index) => {
+        const option = element("option", "", caption);
+        option.value = String(index);
+        option.selected = value === session.values[key];
+        select.append(option);
+      });
+      select.addEventListener("change", () => {
+        session.values[key] = options[Number(select.value)][0];
+        saveSession();
+        drawScene();
+        drawChart();
+      });
+      control.append(element("span", "", label), select);
+      selectors.set(key, select);
+      parameters.append(control);
+    }
+    setControlsDisabled(false);
+    drawScene();
+    renderData();
+  }
+
+  function route() {
+    const fragment = location.hash.slice(1);
+    const definition = chapterLabs.get(fragment);
+    const showOriginal = fragment === electromagnet.id || fragment === "results";
+    const home = !showOriginal && !definition;
+    const currentView = home ? "library" : showOriginal ? electromagnet.id : definition.id;
+    const changed = lastView !== currentView;
+    library.hidden = !home;
+    original.hidden = !showOriginal;
+    extra.hidden = !definition;
+    byId("helpButton").hidden = !showOriginal;
+
+    if (definition && changed) openLab(definition);
+    if (!definition) {
+      cancelAnimation();
+      lab = undefined;
+    }
+    document.title = home ? "物理仿真实验室 · IGCSE"
+      : `${definition?.title ?? "电磁铁实验室"} · IGCSE 物理`;
+
+    if (fragment.startsWith("unit-") || fragment === "results") {
+      requestAnimationFrame(() => byId(fragment)?.scrollIntoView());
+    } else if (changed && lastView !== undefined) {
+      window.scrollTo({ top: 0, behavior: "instant" });
+      (home ? byId("libraryTitle") : definition ? byId("extraTitle") : byId("originalTitle"))
+        .focus({ preventScroll: true });
+    }
+    lastView = currentView;
+  }
+
+  measureButton.addEventListener("click", () => {
+    if (!lab || request) return;
+    const result = lab.measure({ values: session.values, model: session.model, rows: session.rows });
+    if (result.model !== undefined) session.model = result.model;
+    if (result.row) session.rows.push(result.row);
+    session.readout = result.readout;
+    saveSession();
+    const duration = typeof lab.animationMs === "function"
+      ? lab.animationMs({ values: session.values, model: session.model }) : lab.animationMs;
+    if (result.row && duration > 0 && !motion.matches) {
+      setControlsDisabled(true);
+      progress = 0;
+      drawScene();
+      const started = performance.now();
+      function animate(now) {
+        progress = Math.min(1, (now - started) / duration);
+        drawScene();
+        if (progress < 1) {
+          request = requestAnimationFrame(animate);
+        } else {
+          request = 0;
+          setControlsDisabled(false);
+          renderData();
+        }
+      }
+      request = requestAnimationFrame(animate);
+    } else {
+      drawScene();
+      renderData();
+    }
+  });
+  conclusion.addEventListener("input", () => {
+    if (!lab) return;
+    session.conclusion = conclusion.value;
+    saveSession();
+  });
+  parameters.addEventListener("submit", (event) => event.preventDefault());
+  byId("extraReset").addEventListener("click", () => byId("extraResetDialog").showModal());
+  byId("extraConfirmReset").addEventListener("click", () => {
+    session = initialSession(lab);
+    saveSession();
+    byId("extraResetDialog").close();
+    openLab(lab);
+    measureButton.focus({ preventScroll: true });
+  });
+  byId("extraExport").addEventListener("click", () => {
+    const csv = [lab.columns, ...session.rows].map((row) => row.map(
+      (value) => '"' + String(value).replaceAll('"', '""') + '"',
+    ).join(",")).join("\r\n");
+    const link = element("a");
+    link.href = URL.createObjectURL(new Blob(["\ufeff", csv], { type: "text/csv;charset=utf-8" }));
+    link.download = `IGCSE_${lab.id}.csv`;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+  });
+
+  document.querySelector(".skip-link").addEventListener("click", (event) => {
+    event.preventDefault();
+    byId("main").focus({ preventScroll: true });
+    byId("main").scrollIntoView();
+  });
+  new ResizeObserver(drawScene).observe(scene);
+  new ResizeObserver(drawChart).observe(chart);
+  window.addEventListener("hashchange", route);
+  buildLibrary();
+  route();
+})();
+</script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a59243628db8960b',t:'MTc5NDQ1MjE4Mw=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a59243628db8960b',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
