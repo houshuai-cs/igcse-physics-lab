@@ -80,6 +80,16 @@ h1, h2, h3, p { margin: 0; }
 .field-control input:checked + .toggle::after { transform: translateX(15px); }
 .stage-view { background: #f1f4ec; border-block: 1px solid var(--rule); display: grid; place-items: center; flex: 1; }
 #scene { display: block; width: 100%; height: auto; aspect-ratio: 780 / 420; }
+.stage-view { position: relative; }
+.interactive-canvas { touch-action: none; cursor: grab; user-select: none; }
+.interactive-canvas:active { cursor: grabbing; }
+.canvas-interaction-tip {
+  position: absolute; left: 10px; bottom: 9px; z-index: 1; max-width: calc(100% - 20px);
+  padding: 5px 9px; border: 1px solid #b9cbbb; border-radius: 999px;
+  background: rgb(252 253 248 / 88%); backdrop-filter: blur(5px);
+  color: var(--jade); font-size: 12px; font-weight: 680; line-height: 1.3;
+  pointer-events: none; box-shadow: 0 1px 4px #183c2d16;
+}
 .readouts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding-block: 12px; }
 .readout { display: flex; flex-direction: column; padding-inline: clamp(11px, 2vw, 23px); gap: 2px; }
 .readout + .readout { border-left: 1px solid var(--rule); }
@@ -327,6 +337,7 @@ dialog::backdrop { background: rgb(16 42 33 / .43); }
   .action-hint { margin: 8px 0; font-size: 12px; }
   .primary { min-height: 44px; }
   .extra-reading { padding: 6px 12px; min-height: 48px; font-size: 13px; }
+  .canvas-interaction-tip { bottom: 6px; font-size: 10px; padding: 4px 7px; }
   .extra-controls > h2 { display: none; }
   #extraParameters { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 10px; }
   .lab-control { min-width: 0; font-size: 12px; }
@@ -382,7 +393,8 @@ dialog::backdrop { background: rgb(16 42 33 / .43); }
     <div class="stage panel">
       <div class="stage-heading"><h2>实验台</h2></div>
       <div class="stage-view">
-        <canvas id="extraScene" role="img"></canvas>
+        <canvas id="extraScene" class="interactive-canvas" role="img" tabindex="0"></canvas>
+        <p id="extraInteractionTip" class="canvas-interaction-tip"></p>
       </div>
       <div class="extra-reading">
         <span>最近一次读数</span>
@@ -463,7 +475,8 @@ dialog::backdrop { background: rgb(16 42 33 / .43); }
           </label>
         </div>
         <div class="stage-view">
-          <canvas id="scene" role="img" aria-label="电池、电阻、铁芯线圈和回形针构成的实验装置"></canvas>
+          <canvas id="scene" class="interactive-canvas" role="img" tabindex="0" aria-label="电池、电阻、铁芯线圈和回形针构成的实验装置"></canvas>
+          <p class="canvas-interaction-tip">点开关通断电；点线圈切换匝数；向上拖铁芯提起</p>
         </div>
         <div class="readouts">
           <div class="readout">
@@ -1323,7 +1336,7 @@ function createLabScene(canvas) {
     renderResults();
   }
 
-  actionButton.addEventListener("click", () => {
+  function performAction() {
     if (state.complete || timer !== null || selected !== state.turns) return;
     const action = phases[state.phase].action;
     state = LabModel.act(state, action);
@@ -1340,6 +1353,44 @@ function createLabScene(canvas) {
         : coils.find((button) => Number(button.dataset.turns) === state.turns);
       nextControl.focus({ preventScroll: true });
     }
+  }
+
+  actionButton.addEventListener("click", performAction);
+
+  function scenePoint(event) {
+    const rect = stage.getBoundingClientRect();
+    return {
+      x: (event.clientX - rect.left) * 780 / rect.width,
+      y: (event.clientY - rect.top) * 420 / rect.height,
+    };
+  }
+
+  let sceneDrag;
+  stage.addEventListener("pointerdown", (event) => {
+    sceneDrag = scenePoint(event);
+    stage.setPointerCapture(event.pointerId);
+  });
+  stage.addEventListener("pointerup", (event) => {
+    if (!sceneDrag) return;
+    const point = scenePoint(event);
+    const movedUp = sceneDrag.y - point.y > 42;
+    sceneDrag = null;
+    if (state.complete || timer !== null) return;
+    if (movedUp && state.phase === "powered") {
+      performAction();
+      return;
+    }
+    if (point.x > 585 && point.x < 705 && point.y > 180 && point.y < 290) {
+      if (state.phase === "ready" || state.phase === "lifted") performAction();
+      return;
+    }
+    if (point.x > 335 && point.x < 505 && point.y > 135 && point.y < 330 && state.phase === "ready") {
+      const index = LabModel.COILS.indexOf(selected);
+      selected = LabModel.COILS[(index + 1) % LabModel.COILS.length];
+      render();
+      return;
+    }
+    if (point.y > 300 && state.phase === "off") performAction();
   });
 
   for (const button of coils) {
@@ -2628,6 +2679,18 @@ function registerLab(lab) {
     for (const select of selectors.values()) select.disabled = disabled;
   }
 
+  function setControlValue(key, value) {
+    const control = lab.controls.find((item) => item.key === key);
+    const select = selectors.get(key);
+    const index = control.options.findIndex(([candidate]) => candidate === value);
+    if (index < 0) return;
+    session.values[key] = value;
+    select.value = String(index);
+    saveSession();
+    drawScene();
+    drawChart();
+  }
+
   function cancelAnimation() {
     cancelAnimationFrame(request);
     request = 0;
@@ -2737,6 +2800,14 @@ function registerLab(lab) {
     byId("extraTitle").textContent = lab.title;
     byId("extraQuestion").textContent = lab.question;
     byId("extraActionLabel").textContent = lab.button;
+    byId("extraInteractionTip").textContent = {
+      "magnetic-field": "拖动磁针到测点；点磁铁切换摆法；再点当前测点记录",
+      "electromagnetic-induction": "拖动磁铁靠近或远离线圈；轻点磁铁翻转磁极",
+      "half-life": "直接点右侧计时器推进并记录",
+      "radiation-shielding": "点放射源或屏蔽材料切换；点计数器开始测量",
+      "orbital-motion": "拖动行星改变轨道半径，松手观测一圈",
+      "galaxy-redshift": "横向拖动观测光谱改变星系距离，松手读取波长",
+    }[lab.id] ?? "直接点击或拖动画面中的实验器材";
     byId("extraPrompt").textContent = lab.prompt;
     byId("extraProcedure").replaceChildren(...lab.procedure.map((step) => element("li", "", step)));
     conclusion.value = session.conclusion;
@@ -2804,7 +2875,7 @@ function registerLab(lab) {
     lastView = currentView;
   }
 
-  measureButton.addEventListener("click", () => {
+  function performMeasurement() {
     if (!lab || request) return;
     const result = lab.measure({ values: session.values, model: session.model, rows: session.rows });
     if (result.model !== undefined) session.model = result.model;
@@ -2833,6 +2904,114 @@ function registerLab(lab) {
     } else {
       drawScene();
       renderData();
+    }
+  }
+
+  measureButton.addEventListener("click", performMeasurement);
+
+  function logicalPoint(event) {
+    const rect = scene.getBoundingClientRect();
+    return {
+      x: (event.clientX - rect.left) * 780 / rect.width,
+      y: (event.clientY - rect.top) * 420 / rect.height,
+    };
+  }
+
+  function nearestOption(key, target) {
+    const control = lab.controls.find((item) => item.key === key);
+    return control.options.reduce((best, [value]) =>
+      Math.abs(Number(value) - target) < Math.abs(Number(best) - target) ? value : best,
+    control.options[0][0]);
+  }
+
+  let canvasStart;
+  scene.addEventListener("pointerdown", (event) => {
+    if (!lab || request) return;
+    canvasStart = logicalPoint(event);
+    scene.setPointerCapture(event.pointerId);
+  });
+  scene.addEventListener("pointermove", (event) => {
+    if (!canvasStart || request) return;
+    const point = logicalPoint(event);
+    if (lab.id === "orbital-motion") {
+      const radius = nearestOption("radius", Math.hypot(point.x - 236, point.y - 196) / 74);
+      setControlValue("radius", radius);
+    } else if (lab.id === "galaxy-redshift") {
+      const distance = nearestOption("distance", 50 + (point.x - 54) / 672 * 200);
+      setControlValue("distance", distance);
+    }
+  });
+  scene.addEventListener("pointerup", (event) => {
+    if (!canvasStart || !lab || request) return;
+    const start = canvasStart;
+    const point = logicalPoint(event);
+    canvasStart = null;
+    const dx = point.x - start.x;
+    const dy = point.y - start.y;
+    const distance = Math.hypot(dx, dy);
+
+    if (lab.id === "magnetic-field") {
+      const probeEntries = [
+        ["middle", 390, 214], ["above", 390, 108], ["below", 390, 307],
+        ["left", 94, 214], ["right", 686, 214],
+      ];
+      const probe = probeEntries.find(([, x, y]) => Math.hypot(point.x - x, point.y - y) < 52);
+      if (probe) {
+        if (session.values.position === probe[0] && distance < 14) performMeasurement();
+        else setControlValue("position", probe[0]);
+      } else if (point.y > 155 && point.y < 270) {
+        const choices = ["single", "like", "unlike"];
+        setControlValue("configuration", choices[(choices.indexOf(session.values.configuration) + 1) % choices.length]);
+      } else if (point.y < 80) {
+        setControlValue("arrows", session.values.arrows === "shown" ? "hidden" : "shown");
+      }
+      return;
+    }
+
+    if (lab.id === "electromagnetic-induction") {
+      if (distance < 18 && start.x < 380) {
+        setControlValue("pole", session.values.pole === "north" ? "south" : "north");
+        return;
+      }
+      if (Math.abs(dx) > 25) {
+        setControlValue("motion", dx > 0 ? "approach" : "withdraw");
+        setControlValue("speed", nearestOption("speed", Math.abs(dx) > 145 ? 8 : Math.abs(dx) > 75 ? 4 : 2));
+        performMeasurement();
+      } else if (point.x > 520) {
+        setControlValue("motion", "still");
+        performMeasurement();
+      }
+      return;
+    }
+
+    if (lab.id === "half-life") {
+      if (point.x > 500 || point.x < 490) performMeasurement();
+      return;
+    }
+
+    if (lab.id === "radiation-shielding") {
+      if (point.x < 245) {
+        const choices = ["none", "alpha", "beta", "gamma"];
+        setControlValue("source", choices[(choices.indexOf(session.values.source) + 1) % choices.length]);
+      } else if (point.x < 515) {
+        setControlValue("absorber", (session.values.absorber + 1) % 4);
+      } else {
+        performMeasurement();
+      }
+      return;
+    }
+
+    if (lab.id === "orbital-motion") {
+      const radius = nearestOption("radius", Math.hypot(point.x - 236, point.y - 196) / 74);
+      setControlValue("radius", radius);
+      performMeasurement();
+      return;
+    }
+
+    if (lab.id === "galaxy-redshift") {
+      const target = 50 + (point.x - 54) / 672 * 200;
+      setControlValue("distance", nearestOption("distance", target));
+      performMeasurement();
     }
   });
   conclusion.addEventListener("input", () => {
